@@ -54,9 +54,27 @@ const storeCallback = async (session) => {
 const loadCallback = async (id) => {
     const sessionResult = await Session.findById(id)
     if (sessionResult?.content?.length > 0) {
-        return JSON.parse(decrypt(sessionResult.content))
+        const sessionObj = JSON.parse(decrypt(sessionResult.content))
+        // Another Shopify bug
+        return Shopify.Session.Session.cloneSession(sessionObj, sessionObj.id)
     }
     return undefined
+    /**
+     *  // Inside our try, we use `getAsync` to access the method by id
+      // If we receive data back, we parse and return it
+      // If not, we return `undefined`
+      let reply = await firebaseDb.collection(ShopifyAuthStorage.COLLECTION_ID).doc(id).get()
+      if (reply.exists) {
+        const sessionObj = JSON.parse(reply.data().session);
+        // See issue Shopify/shopify-node-api#333 for why we need to call cloneSession()
+        // cloneSession will convert our javascript object into an instance of Session
+        // cloneSession typically wants a Session object as input, but seems to also work
+        // with just a plain javascript object
+        return Session.cloneSession(sessionObj, sessionObj.id);
+      } else {
+        return undefined;
+      }
+     */
 }
 
 const deleteCallback = async (id) => {

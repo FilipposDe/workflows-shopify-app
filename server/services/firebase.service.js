@@ -25,7 +25,6 @@ const storage = getStorage()
 async function findById(id, collection) {
     const ref = await firestore.doc(`${collection}/${id}`)
     const data = await (await ref.get()).data()
-    console.log("F", data)
     return data
 }
 
@@ -39,12 +38,7 @@ async function create(body, collection) {
     const collectionRef = await firestore.collection(collection)
     const ref = collectionRef.doc(body.id)
     await ref.set(body)
-    // const ref = await firestore.doc()
-
-    // const ref = await firestore.doc().set(body)
-
     const data = (await ref.get()).data()
-    console.log("C", data)
     return data
 }
 
@@ -52,7 +46,6 @@ async function updateById(id, body, collection) {
     const ref = await firestore.doc(`${collection}/${id}`)
     await ref.update(body)
     const data = (await ref.get()).data()
-    console.log("Y", data)
     return data
 }
 
