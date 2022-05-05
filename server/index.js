@@ -8,6 +8,7 @@ import "dotenv/config"
 import applyAuthMiddleware from "./middleware/auth.js"
 import verifyRequest from "./middleware/verify-request.js"
 import sessionStorage from "./helpers/sessionStorage.js"
+import { Settings } from "./services/db.service.js"
 
 const USE_ONLINE_TOKENS = true
 const TOP_LEVEL_OAUTH_COOKIE = "shopify_top_level_oauth"
@@ -25,11 +26,10 @@ Shopify.Context.initialize({
     SESSION_STORAGE: sessionStorage,
 })
 
-// let IS_SHOP_INSTALLED = false
 Shopify.Webhooks.Registry.addHandler("APP_UNINSTALLED", {
     path: "/webhooks",
-    webhookHandler: async (topic, shop, body) => {
-        // delete ACTIVE_SHOPIFY_SHOPS[shop]
+    webhookHandler: async () => {
+        await Settings.put("isInstalled", false)
     },
 })
 
@@ -40,7 +40,7 @@ export async function createServer(
 ) {
     const app = express()
     app.set("top-level-oauth-cookie", TOP_LEVEL_OAUTH_COOKIE)
-    // app.set("active-shopify-shops", ACTIVE_SHOPIFY_SHOPS)
+    app.set("is-shop-installed", await Settings.get("isInstalled"))
     app.set("use-online-tokens", USE_ONLINE_TOKENS)
 
     app.use(cookieParser(Shopify.Context.API_SECRET_KEY))
@@ -93,17 +93,17 @@ export async function createServer(
         next()
     })
 
-    // app.use("/*", (req, res, next) => {
-    //     const { shop } = req.query
+    app.use("/*", (req, res, next) => {
+        const { shop } = req.query
 
-    //     // Detect whether we need to reinstall the app, any request from Shopify will
-    //     // include a shop in the query parameters.
-    //     if (app.get("active-shopify-shops")[shop] === undefined && shop) {
-    //         res.redirect(`/auth?${new URLSearchParams(req.query).toString()}`)
-    //     } else {
-    //         next()
-    //     }
-    // })
+        // Detect whether we need to reinstall the app, any request from Shopify will
+        // include a shop in the query parameters.
+        if (!app.get("is-shop-installed") && shop) {
+            res.redirect(`/auth?${new URLSearchParams(req.query).toString()}`)
+        } else {
+            next()
+        }
+    })
 
     /**
      * @type {import('vite').ViteDevServer}
