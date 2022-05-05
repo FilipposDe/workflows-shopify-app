@@ -4,8 +4,12 @@ async function findDocById(id, collection) {
     return await firebaseService.db.findById(id, collection)
 }
 
-async function createDoc(body, collection) {
-    return await firebaseService.db.create(body, collection)
+async function listCollection(collection) {
+    return await firebaseService.db.list(collection)
+}
+
+async function createDoc(body, collection, autoId) {
+    return await firebaseService.db.create(body, collection, autoId)
 }
 
 async function updateDocById(id, body, collection) {
@@ -25,7 +29,7 @@ export const Session = {
         return await findDocById(id, "sessions")
     },
     async create(body) {
-        return await createDoc(body, "sessions")
+        return await createDoc(body, "sessions", false)
     },
     async updateById(id, body) {
         return await updateDocById(id, body, "sessions")
@@ -35,15 +39,30 @@ export const Session = {
     },
 }
 
+export const Workflows = {
+    async list() {
+        return await listCollection("workflows")
+    },
+    async create(body) {
+        return await createDoc(body, "workflows")
+    },
+    async update(id, body) {
+        return await updateDocById(id, body, "workflows")
+    },
+    async delete(id) {
+        return await deleteDocById(id, "workflows")
+    },
+}
+
 export const Settings = {
     async put(key, value) {
         const settingsData = await findFirstDoc("settings")
         if (!settingsData) {
-            return await createDoc({ key: value }, "settings")
+            return await createDoc({ [key]: value }, "settings")
         }
         return await updateDocById(
             settingsData.id,
-            { ...settingsData, key: value },
+            { ...settingsData, [key]: value },
             "settings"
         )
     },

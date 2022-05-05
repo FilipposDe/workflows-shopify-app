@@ -22,6 +22,14 @@ initializeApp({
 const firestore = getFirestore()
 const storage = getStorage()
 
+async function list(collection) {
+    const collectionRef = await firestore.collection(collection)
+    const querySnapshot = await collectionRef.get()
+    const docs = await querySnapshot.docs
+    const data = docs.map((doc) => ({ ...doc.data(), id: doc.id }))
+    return data
+}
+
 async function findById(id, collection) {
     const ref = await firestore.doc(`${collection}/${id}`)
     const data = await (await ref.get()).data()
@@ -29,14 +37,24 @@ async function findById(id, collection) {
 }
 
 async function findFirst(collection) {
-    const refs = await firestore.collection(collection).listDocuments()
-    const data = await refs?.[0]?.get()?.data()
-    return data
+    const collectionRef = await firestore.collection(collection)
+    const querySnapshot = await collectionRef.get()
+    const docs = await querySnapshot.docs
+    const data = docs[0]?.data()
+    if (!data) {
+        return null
+    }
+    return { ...data, id: docs[0].id }
 }
 
-async function create(body, collection) {
+async function create(body, collection, autoId = true) {
     const collectionRef = await firestore.collection(collection)
-    const ref = collectionRef.doc(body.id)
+    let ref
+    if (autoId) {
+        ref = await collectionRef.doc()
+    } else {
+        ref = await collectionRef.doc(body.id)
+    }
     await ref.set(body)
     const data = (await ref.get()).data()
     return data
@@ -60,6 +78,7 @@ const db = {
     updateById,
     deleteById,
     findFirst,
+    list,
 }
 
 const firebaseService = {

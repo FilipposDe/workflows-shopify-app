@@ -29,7 +29,7 @@ function decrypt(text) {
         decrypted = decipher.update(encryptedText)
         decrypted = Buffer.concat([decrypted, decipher.final()])
     } catch (error) {
-        console.error("error")
+        console.error(error)
         return null
     }
     return decrypted.toString()

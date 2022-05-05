@@ -1,11 +1,11 @@
 export default function topLevelAuthRedirect({
-  apiKey,
-  hostName,
-  host,
-  query,
+    apiKey,
+    hostName,
+    host,
+    query,
 }) {
-  const serializedQuery = new URLSearchParams(query).toString();
-  return `<!DOCTYPE html>
+    const serializedQuery = new URLSearchParams(query).toString()
+    return `<!DOCTYPE html>
 <html>
   <head>
     <script src="https://unpkg.com/@shopify/app-bridge@2"></script>
@@ -34,5 +34,5 @@ export default function topLevelAuthRedirect({
     </script>
   </head>
   <body></body>
-</html>`;
+</html>`
 }

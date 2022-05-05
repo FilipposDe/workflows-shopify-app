@@ -1,6 +1,7 @@
-import { Shopify } from "@shopify/shopify-api"
+import { DeliveryMethod, Shopify } from "@shopify/shopify-api"
 
 import topLevelAuthRedirect from "../helpers/top-level-auth-redirect.js"
+import { Settings } from "../services/db.service.js"
 
 export default function applyAuthMiddleware(app) {
     app.get("/auth", async (req, res) => {
@@ -49,12 +50,13 @@ export default function applyAuthMiddleware(app) {
             )
 
             const host = req.query.host
+            Settings.put("isInstalled", true)
             app.set("is-shop-installed", true)
 
-            const response = await Shopify.Webhooks.Registry.register({
+            const response = await Shopify.Webhooks.Registry.registerAll({
                 shop: session.shop,
                 accessToken: session.accessToken,
-                topic: "APP_UNINSTALLED",
+                // topic: "APP_UNINSTALLED",
                 path: "/webhooks",
             })
 

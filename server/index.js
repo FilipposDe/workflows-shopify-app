@@ -1,14 +1,20 @@
 // @ts-check
 import { resolve } from "path"
 import express from "express"
+import fs from "fs"
+import path from "path"
+import { fileURLToPath, pathToFileURL } from "url"
+
 import cookieParser from "cookie-parser"
 import { Shopify, ApiVersion } from "@shopify/shopify-api"
 import "dotenv/config"
-
 import applyAuthMiddleware from "./middleware/auth.js"
-import verifyRequest from "./middleware/verify-request.js"
+import { errorConverter, errorHandler } from "./middleware/error.js"
 import sessionStorage from "./helpers/sessionStorage.js"
-import { Settings } from "./services/db.service.js"
+import catchAsync from "./helpers/catchAsync.js"
+import { Settings, Workflows } from "./services/db.service.js"
+import verifyRequest from "./middleware/verify-request.js"
+import { getImport, initServerFiles } from "./services/dynamicFiles.js"
 
 const USE_ONLINE_TOKENS = true
 const TOP_LEVEL_OAUTH_COOKIE = "shopify_top_level_oauth"
@@ -33,14 +39,25 @@ Shopify.Webhooks.Registry.addHandler("APP_UNINSTALLED", {
     },
 })
 
-// export for test use only
+Shopify.Webhooks.Registry.addHandler("PRODUCTS_CREATE", {
+    path: "/webhooks",
+    webhookHandler: async () => {
+        const { default: productsCreate } = getImport("productsCreate.js")
+        await productsCreate("hi!")
+        console.log("A product was created")
+    },
+})
+
+await initServerFiles()
+
 export async function createServer(
     root = process.cwd(),
     isProd = process.env.NODE_ENV === "production"
 ) {
     const app = express()
     app.set("top-level-oauth-cookie", TOP_LEVEL_OAUTH_COOKIE)
-    app.set("is-shop-installed", await Settings.get("isInstalled"))
+    const isShopInstalled = await Settings.get("isInstalled")
+    app.set("is-shop-installed", isShopInstalled)
     app.set("use-online-tokens", USE_ONLINE_TOKENS)
 
     app.use(cookieParser(Shopify.Context.API_SECRET_KEY))
@@ -59,16 +76,6 @@ export async function createServer(
         }
     })
 
-    app.get("/products-count", verifyRequest(app), async (req, res) => {
-        const session = await Shopify.Utils.loadCurrentSession(req, res, true)
-        const { Product } = await import(
-            `@shopify/shopify-api/dist/rest-resources/${Shopify.Context.API_VERSION}/index.js`
-        )
-
-        const countData = await Product.count({ session })
-        res.status(200).send(countData)
-    })
-
     app.post("/graphql", verifyRequest(app), async (req, res) => {
         try {
             const response = await Shopify.Utils.graphqlProxy(req, res)
@@ -79,6 +86,50 @@ export async function createServer(
     })
 
     app.use(express.json())
+
+    app.get(
+        "/workflows",
+        verifyRequest(app),
+        catchAsync(async (req, res) => {
+            const result = await Workflows.list()
+            res.status(200).send(result)
+
+            // const session = await Shopify.Utils.loadCurrentSession(req, res, true)
+            // const { Product } = await import(
+            //     `@shopify/shopify-api/dist/rest-resources/${Shopify.Context.API_VERSION}/index.js`
+            // )
+
+            // const countData = await Product.count({ session })
+            // res.status(200).send(countData)
+        })
+    )
+
+    app.post(
+        "/workflows",
+        verifyRequest(app),
+        catchAsync(async (req, res) => {
+            const data = await Workflows.create(req.body)
+            res.status(200).send(data)
+        })
+    )
+
+    app.patch(
+        "/workflows/:id",
+        verifyRequest(app),
+        catchAsync(async (req, res) => {
+            const data = await Workflows.update(req.params.id, req.body)
+            res.status(200).send(data)
+        })
+    )
+
+    app.delete(
+        "/workflows/:id",
+        verifyRequest(app),
+        catchAsync(async (req, res) => {
+            await Workflows.delete(req.params.id)
+            res.status(200).send({})
+        })
+    )
 
     app.use((req, res, next) => {
         const shop = req.query.shop
@@ -146,6 +197,10 @@ export async function createServer(
                 )
         })
     }
+
+    app.use(errorConverter)
+
+    app.use(errorHandler)
 
     return { app, vite }
 }
