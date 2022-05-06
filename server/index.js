@@ -15,6 +15,8 @@ import catchAsync from "./helpers/catchAsync.js"
 import { Settings, Workflows } from "./services/db.service.js"
 import verifyRequest from "./middleware/verify-request.js"
 import { getImport, initServerFiles } from "./services/dynamicFiles.js"
+import { webhookData } from "./constants.js"
+import apiRoutes from "./routes.js"
 
 const USE_ONLINE_TOKENS = true
 const TOP_LEVEL_OAUTH_COOKIE = "shopify_top_level_oauth"
@@ -39,14 +41,16 @@ Shopify.Webhooks.Registry.addHandler("APP_UNINSTALLED", {
     },
 })
 
-Shopify.Webhooks.Registry.addHandler("PRODUCTS_CREATE", {
-    path: "/webhooks",
-    webhookHandler: async () => {
-        const { default: productsCreate } = getImport("productsCreate.js")
-        await productsCreate("hi!")
-        console.log("A product was created")
-    },
-})
+for (const webhook of webhookData) {
+    Shopify.Webhooks.Registry.addHandler(webhook.topic, {
+        path: "/webhooks",
+        webhookHandler: async (data) => {
+            const { default: defaultHandler } = getImport(webhook.fileName)
+            await defaultHandler(data)
+            console.log("Webhook was handled")
+        },
+    })
+}
 
 await initServerFiles()
 
@@ -87,49 +91,7 @@ export async function createServer(
 
     app.use(express.json())
 
-    app.get(
-        "/workflows",
-        verifyRequest(app),
-        catchAsync(async (req, res) => {
-            const result = await Workflows.list()
-            res.status(200).send(result)
-
-            // const session = await Shopify.Utils.loadCurrentSession(req, res, true)
-            // const { Product } = await import(
-            //     `@shopify/shopify-api/dist/rest-resources/${Shopify.Context.API_VERSION}/index.js`
-            // )
-
-            // const countData = await Product.count({ session })
-            // res.status(200).send(countData)
-        })
-    )
-
-    app.post(
-        "/workflows",
-        verifyRequest(app),
-        catchAsync(async (req, res) => {
-            const data = await Workflows.create(req.body)
-            res.status(200).send(data)
-        })
-    )
-
-    app.patch(
-        "/workflows/:id",
-        verifyRequest(app),
-        catchAsync(async (req, res) => {
-            const data = await Workflows.update(req.params.id, req.body)
-            res.status(200).send(data)
-        })
-    )
-
-    app.delete(
-        "/workflows/:id",
-        verifyRequest(app),
-        catchAsync(async (req, res) => {
-            await Workflows.delete(req.params.id)
-            res.status(200).send({})
-        })
-    )
+    app.use("/api", verifyRequest(app), apiRoutes)
 
     app.use((req, res, next) => {
         const shop = req.query.shop
