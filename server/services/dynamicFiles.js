@@ -2,11 +2,23 @@ import path from "path"
 import fs from "fs"
 import { fileURLToPath, pathToFileURL } from "url"
 import { Workflows } from "./db.service.js"
+import eslint from "eslint"
 
 const DYNAMIC_IMPORTS = {}
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
+
+const lintConfig = {
+    env: {
+        es2021: true,
+        node: true,
+    },
+    parserOptions: {
+        ecmaVersion: "latest",
+        sourceType: "module",
+    },
+}
 
 async function dynamicallyImportFile(fileName) {
     const filePath = getDynamicFilePath(fileName)
@@ -40,6 +52,12 @@ function validateDynamicFile(fileName) {
     const textEnd = `}`
     const trimmed = text.trim()
     if (!trimmed.startsWith(textStart) || !trimmed.endsWith(textEnd)) {
+        return false
+    }
+    const { Linter } = eslint
+    const linter = new Linter()
+    const lintMessages = linter.verify(trimmed, lintConfig)
+    if (lintMessages.some((message) => message.fatal)) {
         return false
     }
     return true
