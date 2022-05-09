@@ -34,6 +34,15 @@ export const useWorkflows = () => {
         return data
     }
 
+    async function publishWorkflow(id) {
+        const response = await fetch(`/api/workflows/${id}/publish`, {
+            method: "POST",
+        })
+        if (!response.ok) return { error: "Internal Server Error" }
+        const data = await response.json()
+        return data
+    }
+
     async function deleteWorkflow(id) {
         const response = await fetch(`/api/workflows/${id}`, {
             method: "DELETE",
@@ -48,6 +57,7 @@ export const useWorkflows = () => {
         getWorkflows,
         updateWorkflow,
         deleteWorkflow,
+        publishWorkflow
     }
 }
 

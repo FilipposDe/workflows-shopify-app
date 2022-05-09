@@ -14,16 +14,26 @@ import sessionStorage from "./helpers/sessionStorage.js"
 import catchAsync from "./helpers/catchAsync.js"
 import { Settings, Workflows } from "./services/db.service.js"
 import verifyRequest from "./middleware/verify-request.js"
-import { getImport, initServerFiles } from "./services/dynamicFiles.js"
-import { webhookData } from "./constants.js"
+import {
+    getImport,
+    initServerFiles,
+    dynamicFileExists,
+} from "./services/dynamicFiles.service.js"
+import { webhookData, webhookTopics } from "./constants.js"
 import apiRoutes from "./routes.js"
 
+/**
+ * CONSTANTS
+ */
 const USE_ONLINE_TOKENS = true
 const TOP_LEVEL_OAUTH_COOKIE = "shopify_top_level_oauth"
 
 const PORT = parseInt(process.env.PORT || "8081", 10)
 const isTest = process.env.NODE_ENV === "test" || !!process.env.VITE_TEST_BUILD
 
+/**
+ * INIT SHOPIFY CONTEXT
+ */
 Shopify.Context.initialize({
     API_KEY: process.env.SHOPIFY_API_KEY,
     API_SECRET_KEY: process.env.SHOPIFY_API_SECRET,
@@ -34,6 +44,9 @@ Shopify.Context.initialize({
     SESSION_STORAGE: sessionStorage,
 })
 
+/**
+ * ADD UNINSTALL WEBHOOK
+ */
 Shopify.Webhooks.Registry.addHandler("APP_UNINSTALLED", {
     path: "/webhooks",
     webhookHandler: async () => {
@@ -41,13 +54,18 @@ Shopify.Webhooks.Registry.addHandler("APP_UNINSTALLED", {
     },
 })
 
-for (const webhook of webhookData) {
-    Shopify.Webhooks.Registry.addHandler(webhook.topic, {
+for (const topic of webhookTopics) {
+    Shopify.Webhooks.Registry.addHandler(topic, {
         path: "/webhooks",
         webhookHandler: async (data) => {
-            const { default: defaultHandler } = getImport(webhook.fileName)
-            await defaultHandler(data)
-            console.log("Webhook was handled")
+            const fileName = Workflows.getFileNameFromTopic(topic)
+            if (dynamicFileExists(fileName)) {
+                const { default: defaultHandler } = getImport(fileName)
+                await defaultHandler(data)
+                console.log("Webhook was handled by file")
+                return
+            }
+            console.log("Webhook was not handled by any file")
         },
     })
 }

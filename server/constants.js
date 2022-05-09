@@ -2,7 +2,7 @@ export const webhookData = [
     { topic: "PRODUCTS_CREATE", fileName: "productsCreate.js" },
 ]
 
-const topics = [
+export const webhookTopics = [
     "CARTS_CREATE",
     "CARTS_UPDATE",
     "CHECKOUTS_CREATE",
@@ -66,3 +66,4 @@ const topics = [
     "VARIANTS_IN_STOCK",
     "VARIANTS_OUT_OF_STOCK",
 ]
+

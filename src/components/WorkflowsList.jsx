@@ -8,6 +8,7 @@ import {
     Button,
     Filters,
     IndexTable,
+    Badge,
 } from "@shopify/polaris"
 import { Toast, useAppBridge } from "@shopify/app-bridge-react"
 import { gql, useMutation } from "@apollo/client"
@@ -50,13 +51,13 @@ export function WorkflowsList(props) {
                 condensed
                 loading={workflowsLoading}
                 // bulkActions={bulkActions}
-                headings={[{ title: "Title" }, { fileName: "File name" }]}
+                headings={[{ webhookTopic: "Topic", fileExists: "File" }]}
             >
                 {workflows.map((item, index) => (
                     <IndexTable.Row
-                        id={item.title}
+                        id={item.id}
                         key={index}
-                        selected={selected.includes(item.title)}
+                        selected={selected.includes(item.id)}
                         position={index}
                     >
                         <div
@@ -65,10 +66,20 @@ export function WorkflowsList(props) {
                         >
                             <p>
                                 <TextStyle variation="strong">
-                                    {item.title}
+                                    {item.webhookTopic}
                                 </TextStyle>
+                                <p>
+                                    {item.fileIsPublished ? (
+                                        <Badge status="success">
+                                            Published
+                                        </Badge>
+                                    ) : (
+                                        <Badge status="critical">
+                                            Unpublished
+                                        </Badge>
+                                    )}
+                                </p>
                             </p>
-                            <p>{item.fileName}</p>
                         </div>
                     </IndexTable.Row>
                 ))}

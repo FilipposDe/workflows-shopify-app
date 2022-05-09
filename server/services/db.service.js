@@ -1,3 +1,4 @@
+import { capUnderscoreToCamelCase } from "../../util/topics.js"
 import firebaseService from "./firebase.service.js"
 
 async function findDocById(id, collection) {
@@ -40,6 +41,13 @@ export const Session = {
 }
 
 export const Workflows = {
+    getFileNameFromTopic(topic) {
+        const fileName = capUnderscoreToCamelCase(topic) + ".js"
+        return fileName
+    },
+    async findById(id) {
+        return await findDocById(id, "workflows")
+    },
     async list() {
         return await listCollection("workflows")
     },

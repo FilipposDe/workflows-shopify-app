@@ -3,6 +3,7 @@ import fs from "fs"
 import { fileURLToPath, pathToFileURL } from "url"
 import { Workflows } from "./db.service.js"
 import eslint from "eslint"
+import { capUnderscoreToCamelCase } from "../../util/topics.js"
 
 const DYNAMIC_IMPORTS = {}
 
@@ -34,7 +35,14 @@ function getDynamicFilePath(fileName) {
 
 function writeDynamicFile(fileName, text) {
     const filePath = getDynamicFilePath(fileName)
-    fs.writeFileSync(filePath, text)
+    const fileContent = `export default async function ${
+        fileName.split(".")[0]
+                    // TODO continue work
+
+    }(data) {
+        ${text}
+    }`
+    fs.writeFileSync(filePath, fileContent)
 }
 
 function dynamicFileExists(fileName) {
@@ -48,7 +56,7 @@ function validateDynamicFile(fileName) {
     const file = fs.readFileSync(filePath, { encoding: "utf8" })
     const text = file.toString()
     const functionName = fileName.split(".")[0]
-    const textStart = `export default function ${functionName}(data) {`
+    const textStart = `export default async function ${functionName}(data) {`
     const textEnd = `}`
     const trimmed = text.trim()
     if (!trimmed.startsWith(textStart) || !trimmed.endsWith(textEnd)) {
@@ -63,11 +71,21 @@ function validateDynamicFile(fileName) {
     return true
 }
 
+export async function publishFile(fileName, code) {
+    writeDynamicFile(fileName, code)
+    if (!validateDynamicFile(fileName)) {
+        return false
+    }
+    await dynamicallyImportFile(fileName)
+    return true
+}
+
 export async function initServerFiles() {
     const allWorkflows = await Workflows.list()
     const invalidWorkflows = []
     for (const workflow of allWorkflows) {
-        const { fileName, code } = workflow
+        const { webhookTopic, code } = workflow
+        const fileName = Workflows.getFileNameFromTopic(webhookTopic)
         if (!dynamicFileExists(fileName)) {
             writeDynamicFile(fileName, code)
         }
@@ -82,3 +100,33 @@ export async function initServerFiles() {
 export function getImport(fileName) {
     return DYNAMIC_IMPORTS[fileName]
 }
+
+export async function getAllFiles() {
+    const dirPath = path.join(__dirname, "..", "..", "storage")
+    const fileNames = []
+    const dirFiles = fs.readdirSync(dirPath)
+    for (const file of dirFiles) {
+        fileNames.push(file)
+    }
+    return fileNames
+}
+
+export const validateDynamicFileAsync = (fileName) =>
+    new Promise((resolve) => {
+        const isValid = validateDynamicFile(fileName)
+        resolve(isValid)
+    })
+
+export const getFunctionContents = (fileName) =>
+    new Promise((resolve) => {
+        const filePath = getDynamicFilePath(fileName)
+        const text = fs.readFileSync(filePath, { encoding: "utf8" })
+        const trimmed = text.toString().trim()
+        let result = ""
+        result = trimmed.replace(
+            /^\s*export default async function [a-zA-Z]*\(data\) {\s*/,
+            ""
+        )
+        result = result.replace(/}\s*$/, "")
+        resolve(result)
+    })
