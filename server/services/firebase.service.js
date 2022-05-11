@@ -1,26 +1,32 @@
 import { initializeApp, cert, applicationDefault } from "firebase-admin/app"
 import { getFirestore } from "firebase-admin/firestore"
 import { getStorage } from "firebase-admin/storage"
+import config from "../config.js"
 
-let credential
-if (process.env.NODE_ENV === "development") {
-    credential = cert(applicationDefault())
-} else {
-    credential = cert({
-        projectId: process.env.FIREBASE_PROJECT_ID,
-        clientEmail: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-        privateKey: process.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY,
+let firestore
+let storage
+
+function initDB() {
+    let credential
+    if (config.isDev) {
+        credential = cert(applicationDefault())
+    } else {
+        credential = cert({
+            projectId: config.FIREBASE_PROJECT_ID,
+            clientEmail: config.GOOGLE_SERVICE_ACCOUNT_EMAIL,
+            privateKey: config.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY,
+        })
+    }
+
+    initializeApp({
+        databaseURL: config.FIREBASE_DB_URL,
+        storageBucket: config.FIREBASE_BUCKET,
+        credential,
     })
+
+    firestore = getFirestore()
+    storage = getStorage()
 }
-
-initializeApp({
-    databaseURL: process.env.FIREBASE_DB_URL,
-    storageBucket: process.env.FIREBASE_BUCKET,
-    credential,
-})
-
-const firestore = getFirestore()
-const storage = getStorage()
 
 async function list(collection) {
     const collectionRef = await firestore.collection(collection)
@@ -73,6 +79,7 @@ async function deleteById(id, collection) {
 }
 
 const db = {
+    initDB,
     findById,
     create,
     updateById,

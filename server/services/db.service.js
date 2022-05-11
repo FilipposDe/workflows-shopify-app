@@ -1,31 +1,70 @@
 import { capUnderscoreToCamelCase } from "../../util/topics.js"
 import firebaseService from "./firebase.service.js"
 
+function init() {
+    try {
+        firebaseService.db.initDB()
+    } catch (error) {
+        console.error("Failed to init DB, exiting", error)
+        process.exit(1)
+    }
+}
+
 async function findDocById(id, collection) {
-    return await firebaseService.db.findById(id, collection)
+    try {
+        return await firebaseService.db.findById(id, collection)
+    } catch (error) {
+        console.error("DB Error", error)
+        throw new Error("DB Error")
+    }
 }
 
 async function listCollection(collection) {
-    return await firebaseService.db.list(collection)
+    try {
+        return await firebaseService.db.list(collection)
+    } catch (error) {
+        console.error("DB Error", error)
+        throw new Error("DB Error")
+    }
 }
 
 async function createDoc(body, collection, autoId) {
-    return await firebaseService.db.create(body, collection, autoId)
+    try {
+        return await firebaseService.db.create(body, collection, autoId)
+    } catch (error) {
+        console.error("DB Error", error)
+        throw new Error("DB Error")
+    }
 }
 
 async function updateDocById(id, body, collection) {
-    return await firebaseService.db.updateById(id, body, collection)
+    try {
+        return await firebaseService.db.updateById(id, body, collection)
+    } catch (error) {
+        console.error("DB Error", error)
+        throw new Error("DB Error")
+    }
 }
 
 async function deleteDocById(id, collection) {
-    return await firebaseService.db.deleteById(id, collection)
+    try {
+        return await firebaseService.db.deleteById(id, collection)
+    } catch (error) {
+        console.error("DB Error", error)
+        throw new Error("DB Error")
+    }
 }
 
 async function findFirstDoc(collection) {
-    return await firebaseService.db.findFirst(collection)
+    try {
+        return await firebaseService.db.findFirst(collection)
+    } catch (error) {
+        console.error("DB Error", error)
+        throw new Error("DB Error")
+    }
 }
 
-export const Session = {
+const Session = {
     async findById(id) {
         return await findDocById(id, "sessions")
     },
@@ -40,7 +79,7 @@ export const Session = {
     },
 }
 
-export const Workflows = {
+const Workflows = {
     getFileNameFromTopic(topic) {
         const fileName = capUnderscoreToCamelCase(topic) + ".js"
         return fileName
@@ -62,7 +101,7 @@ export const Workflows = {
     },
 }
 
-export const Settings = {
+const Settings = {
     async put(key, value) {
         const settingsData = await findFirstDoc("settings")
         if (!settingsData) {
@@ -82,3 +121,16 @@ export const Settings = {
         return settingsData[key]
     },
 }
+
+const models = {
+    Session,
+    Workflows,
+    Settings,
+}
+
+const dbService = {
+    init,
+    ...models,
+}
+
+export default dbService

@@ -1,22 +1,31 @@
-import { DeliveryMethod, Shopify } from "@shopify/shopify-api"
-
+import { Shopify } from "@shopify/shopify-api"
 import topLevelAuthRedirect from "../helpers/top-level-auth-redirect.js"
-import { Settings } from "../services/db.service.js"
+import dbService from "../services/db.service.js"
+const { Settings } = dbService
+
+const OFFLINE_AUTH_URL = "/auth"
+const OFFLINE_CB_URL = "/auth/callback"
+const ONLINE_AUTH_URL = "/auth-online"
+const ONLINE_CB_URL = "/auth-online/callback"
 
 export default function applyAuthMiddleware(app) {
-    app.get("/auth", async (req, res) => {
-        if (!req.signedCookies[app.get("top-level-oauth-cookie")]) {
-            return res.redirect(
-                `/auth/toplevel?${new URLSearchParams(req.query).toString()}`
-            )
+    app.get(OFFLINE_AUTH_URL, async (req, res) => {
+        const topLevelCookie = app.get("top-level-oauth-cookie")
+        const reqHasTopLevelCookie = req.signedCookies[topLevelCookie]
+        if (!reqHasTopLevelCookie) {
+            const queryStr = new URLSearchParams(req.query).toString()
+            const topLevelRouteRedirect = `/auth/toplevel?${queryStr}`
+            res.redirect(topLevelRouteRedirect)
+            return
         }
 
+        const IS_ONLINE = false
         const redirectUrl = await Shopify.Auth.beginAuth(
             req,
             res,
             req.query.shop,
-            "/auth/callback",
-            app.get("use-online-tokens")
+            OFFLINE_CB_URL,
+            IS_ONLINE
         )
 
         res.redirect(redirectUrl)
@@ -41,7 +50,7 @@ export default function applyAuthMiddleware(app) {
         )
     })
 
-    app.get("/auth/callback", async (req, res) => {
+    app.get(OFFLINE_CB_URL, async (req, res) => {
         try {
             const session = await Shopify.Auth.validateAuthCallback(
                 req,
@@ -49,8 +58,7 @@ export default function applyAuthMiddleware(app) {
                 req.query
             )
 
-            const host = req.query.host
-            Settings.put("isInstalled", true)
+            await Settings.put("isInstalled", true)
             app.set("is-shop-installed", true)
 
             const response = await Shopify.Webhooks.Registry.registerAll({
@@ -67,7 +75,7 @@ export default function applyAuthMiddleware(app) {
             }
 
             // Redirect to app with shop parameter upon auth
-            res.redirect(`/?shop=${session.shop}&host=${host}`)
+            res.redirect(`/?shop=${session.shop}&host=${req.query.host}`)
         } catch (e) {
             switch (true) {
                 case e instanceof Shopify.Errors.InvalidOAuthError:
