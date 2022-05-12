@@ -3,13 +3,17 @@ import config from "../config.js"
 import sessionStorage from "../helpers/sessionStorage.js"
 // import { webhookTopics } from "../constants.js"
 import dbService from "./db.service.js"
-const { Settings } = dbService
+const { Settings, Session } = dbService
 // import { getImport, dynamicFileExists } from "./dynamicFiles.service.js"
 
 async function handleStoreUninstall() {
     try {
         await Settings.put("isInstalled", false)
-        // TODO erase sessions and other cleanup
+        const allSessionsInDB = await Session.list()
+        for await (const session of allSessionsInDB) {
+            await Session.deleteById(session.id)
+        }
+        console.log("App: Store uninstalled, cleared all sessions")
     } catch (error) {
         console.error("DB error while handling store uninstall", error)
     }
@@ -26,8 +30,9 @@ function initContext() {
             IS_EMBEDDED_APP: true,
             SESSION_STORAGE: sessionStorage,
         })
+        console.log("App: Initialized Shopify Context")
     } catch (error) {
-        console.error("Error during Shopify Context init, exiting", error)
+        console.error("Error during Shopify Context init, exiting.", error)
         process.exit(1)
     }
 }
@@ -38,9 +43,10 @@ function registerUninstallHandler() {
             path: "/webhooks",
             webhookHandler: handleStoreUninstall,
         })
+        console.log("App: Registered uninstall webhook")
     } catch (error) {
         console.error(
-            "Error while registering APP_UNINSTALLED webhook, exiting",
+            "Error while registering APP_UNINSTALLED webhook, exiting.",
             error
         )
         process.exit(1)

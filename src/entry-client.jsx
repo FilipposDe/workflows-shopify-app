@@ -1,5 +1,15 @@
-import ReactDOM from "react-dom";
+import { StrictMode } from "react"
+import ReactDOM from "react-dom"
 
-import App from "./App";
+import App from "./App"
+import ErrorBoundary from "./components/ErrorBoundary"
 
-ReactDOM.render(<App />, document.getElementById("app"));
+ReactDOM.render(
+    <StrictMode>
+        <ErrorBoundary>
+            <App />
+        </ErrorBoundary>
+    </StrictMode>,
+
+    document.getElementById("app")
+)

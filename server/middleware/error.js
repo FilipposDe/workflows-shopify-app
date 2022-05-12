@@ -1,6 +1,7 @@
 import ApiError from "./../helpers/ApiError.js"
 
 export const errorConverter = (err, req, res, next) => {
+    console.log("Debug: h1")
     let error = err
     if (!(error instanceof ApiError)) {
         const statusCode = error.statusCode ? 400 : 500
@@ -14,6 +15,8 @@ export const errorConverter = (err, req, res, next) => {
 }
 
 export const errorHandler = (err, req, res, next) => {
+    console.log("Debug: h2")
+
     let { statusCode, message } = err
     if (process.env.NODE_ENV === "production" && !err.isOperational) {
         statusCode = 500

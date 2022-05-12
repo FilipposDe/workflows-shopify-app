@@ -3,6 +3,8 @@ import dbService from "./services/db.service.js"
 import shopifyService from "./services/shopify.service.js"
 import { createServer } from "./server.js"
 
+console.log("App: Starting")
+
 dbService.init()
 shopifyService.initContext()
 shopifyService.registerUninstallHandler()
@@ -10,7 +12,8 @@ shopifyService.registerUninstallHandler()
 if (!config.isTest) {
     const { app } = await createServer()
     app.listen(config.PORT)
-    console.log(`Server listining on port ${config.PORT}`)
+    console.log(`App: Server listening on port ${config.PORT}`)
+    console.log("App: Ready")
 }
 
 // for (const topic of webhookTopics) {

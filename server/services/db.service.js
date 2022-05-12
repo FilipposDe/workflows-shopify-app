@@ -4,8 +4,9 @@ import firebaseService from "./firebase.service.js"
 function init() {
     try {
         firebaseService.db.initDB()
+        console.log("App: Initialized DB")
     } catch (error) {
-        console.error("Failed to init DB, exiting", error)
+        console.error("Failed to init DB, exiting.", error)
         process.exit(1)
     }
 }
@@ -65,6 +66,9 @@ async function findFirstDoc(collection) {
 }
 
 const Session = {
+    async list() {
+        return await listCollection("sessions")
+    },
     async findById(id) {
         return await findDocById(id, "sessions")
     },

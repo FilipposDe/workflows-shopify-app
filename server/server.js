@@ -10,8 +10,10 @@ import webhookRoutes from "./routes/webhook.routes.js"
 import graphqlRoutes from "./routes/graphql.routes.js"
 import cspHeaders from "./middleware/csp-headers.js"
 import authRoutes from "./routes/auth.routes.js"
+import { errorConverter, errorHandler } from "./middleware/error.js"
 const { Settings } = dbService
 const { Shopify } = shopifyService
+const router = express.Router()
 
 function getViteDevOpts(root) {
     return {
@@ -49,7 +51,7 @@ export async function createServer(
     const app = express()
     await setServerSettings(app)
     app.use(cookieParser(Shopify.Context.API_SECRET_KEY))
-    app.use("/webhooks", authRoutes)
+    app.use("/auth", authRoutes)
     app.use("/webhooks", webhookRoutes)
     app.use("/graphql", verifyRequest(app), graphqlRoutes)
     app.use(express.json())
@@ -82,8 +84,8 @@ export async function createServer(
         })
     }
 
-    // app.use(errorConverter)
-    // app.use(errorHandler)
+    app.use(errorConverter)
+    app.use(errorHandler)
 
     return { app, vite }
 }
