@@ -1,4 +1,3 @@
-/* eslint-disable no-unreachable */
 import express from "express"
 import { DEBUG_MSG } from "../helpers/constants.js"
 import catchAsync from "../helpers/catchAsync.js"
@@ -98,7 +97,7 @@ authRoutes.get(
                 await Settings.put("isInstalled", true)
                 req.app.set("is-shop-installed", true)
 
-                // 2. Register webhooks
+                // 2. Register webhooks // TODO rest
                 console.log(DEBUG_MSG.REGISTERING_W_HOOKS)
                 const response = await Shopify.Webhooks.Registry.registerAll({
                     shop: session.shop,

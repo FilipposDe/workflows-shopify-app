@@ -23,8 +23,8 @@ export const useWorkflows = () => {
         return data
     }
 
-    async function updateWorkflow(id, body) {
-        const response = await fetch(`/api/workflows/${id}`, {
+    async function updateWorkflow(topic, body) {
+        const response = await fetch(`/api/workflows/${topic}`, {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(body),
@@ -34,8 +34,8 @@ export const useWorkflows = () => {
         return data
     }
 
-    async function publishWorkflow(id) {
-        const response = await fetch(`/api/workflows/${id}/publish`, {
+    async function publishWorkflow(topic) {
+        const response = await fetch(`/api/workflows/${topic}/publish`, {
             method: "POST",
         })
         if (!response.ok) return { error: "Internal Server Error" }
@@ -43,8 +43,8 @@ export const useWorkflows = () => {
         return data
     }
 
-    async function deleteWorkflow(id) {
-        const response = await fetch(`/api/workflows/${id}`, {
+    async function deleteWorkflow(topic) {
+        const response = await fetch(`/api/workflows/${topic}`, {
             method: "DELETE",
         })
         if (!response.ok) return { error: "Internal Server Error" }
@@ -57,7 +57,7 @@ export const useWorkflows = () => {
         getWorkflows,
         updateWorkflow,
         deleteWorkflow,
-        publishWorkflow
+        publishWorkflow,
     }
 }
 

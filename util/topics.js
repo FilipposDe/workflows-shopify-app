@@ -23,3 +23,13 @@ export function capUnderscoreToHuman(text) {
 
     return result.trim()
 }
+
+export function removeChars(text, removeChars) {
+    let result = text
+    for (const char of removeChars) {
+        while (text.indexOf(char) !== -1) {
+            result += result.replace(char, "")
+        }
+    }
+    return result
+}

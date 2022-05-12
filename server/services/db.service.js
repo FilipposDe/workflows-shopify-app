@@ -88,20 +88,21 @@ const Workflows = {
         const fileName = capUnderscoreToCamelCase(topic) + ".js"
         return fileName
     },
-    async findById(id) {
-        return await findDocById(id, "workflows")
+    async findByTopic(topic) {
+        return await findDocById(topic, "workflows")
     },
     async list() {
         return await listCollection("workflows")
     },
     async create(body) {
-        return await createDoc(body, "workflows")
+        body.id = body.topic
+        return await createDoc(body, "workflows", false)
     },
-    async update(id, body) {
-        return await updateDocById(id, body, "workflows")
+    async update(topic, body) {
+        return await updateDocById(topic, body, "workflows")
     },
-    async delete(id) {
-        return await deleteDocById(id, "workflows")
+    async delete(topic) {
+        return await deleteDocById(topic, "workflows")
     },
 }
 
@@ -126,15 +127,11 @@ const Settings = {
     },
 }
 
-const models = {
+const dbService = {
+    init,
     Session,
     Workflows,
     Settings,
-}
-
-const dbService = {
-    init,
-    ...models,
 }
 
 export default dbService

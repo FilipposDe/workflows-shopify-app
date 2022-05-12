@@ -51,13 +51,13 @@ export function WorkflowsList(props) {
                 condensed
                 loading={workflowsLoading}
                 // bulkActions={bulkActions}
-                headings={[{ webhookTopic: "Topic", fileExists: "File" }]}
+                headings={[{ topic: "Topic", fileExists: "File" }]}
             >
                 {workflows.map((item, index) => (
                     <IndexTable.Row
-                        id={item.id}
+                        topic={item.topic}
                         key={index}
-                        selected={selected.includes(item.id)}
+                        selected={selected.includes(item.topic)}
                         position={index}
                     >
                         <div
@@ -66,7 +66,7 @@ export function WorkflowsList(props) {
                         >
                             <p>
                                 <TextStyle variation="strong">
-                                    {item.webhookTopic}
+                                    {item.topic}
                                 </TextStyle>
                                 <p>
                                     {item.fileIsPublished ? (

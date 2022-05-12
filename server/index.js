@@ -7,7 +7,9 @@ console.log("App: Starting")
 
 dbService.init()
 shopifyService.initContext()
-shopifyService.registerUninstallHandler()
+shopifyService.addUninstallHandler()
+shopifyService.addExistingHandlers([], () => {}) // TODO
+await shopifyService.reRegisterExistingWebhooks()
 
 if (!config.isTest) {
     const { app } = await createServer()
@@ -15,21 +17,5 @@ if (!config.isTest) {
     console.log(`App: Server listening on port ${config.PORT}`)
     console.log("App: Ready")
 }
-
-// for (const topic of webhookTopics) {
-//     Shopify.Webhooks.Registry.addHandler(topic, {
-//         path: "/webhooks",
-//         webhookHandler: async (data) => {
-//             const fileName = Workflows.getFileNameFromTopic(topic)
-//             if (dynamicFileExists(fileName)) {
-//                 const { default: defaultHandler } = getImport(fileName)
-//                 await defaultHandler(data)
-//                 console.log("Webhook was handled by file")
-//                 return
-//             }
-//             console.log("Webhook was not handled by any file")
-//         },
-//     })
-// }
 
 // await initServerFiles()

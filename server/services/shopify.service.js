@@ -37,7 +37,25 @@ function initContext() {
     }
 }
 
-function registerUninstallHandler() {
+function addExistingHandlers(topics, getHandler) {
+    try {
+        for (const topic of topics) {
+            Shopify.Webhooks.Registry.addHandler(topic, {
+                path: "/webhooks",
+                webhookHandler: getHandler(topic),
+            })
+        }
+    } catch (error) {
+        console.error(
+            "Error while registering existing webhooks, exiting.",
+            error
+        )
+        process.exit(1)
+    }
+    console.log("App: Added existing webhook handlers to registry")
+}
+
+function addUninstallHandler() {
     try {
         Shopify.Webhooks.Registry.addHandler("APP_UNINSTALLED", {
             path: "/webhooks",
@@ -53,15 +71,41 @@ function registerUninstallHandler() {
     }
 }
 
-async function createApiClient(accessToken, isGraphql = true) {
+async function reRegisterExistingWebhooks() {
     try {
-        if (isGraphql) {
-            const client = new Shopify.Clients.Graphql(config.SHOP, accessToken)
-            return client
-        } else {
-            // TODO
-            return
+        const offlineSession = await Shopify.Utils.loadOfflineSession(
+            config.SHOP
+        )
+        const response = await Shopify.Webhooks.Registry.registerAll({
+            shop: config.SHOP,
+            accessToken: offlineSession.accessToken,
+            path: "/webhooks",
+        })
+
+        const addedTopics = Shopify.Webhooks.Registry.getTopics()
+        for (const topic of addedTopics) {
+            if (!response[topic].success) {
+                console.error(response.result)
+                throw new Error(`Failed to register ${topic} webhook`)
+            }
         }
+
+        console.log("App: Re-registered existing webhooks")
+    } catch (error) {
+        console.error("Error while registering webhooks, exiting.", error)
+        process.exit(1)
+    }
+}
+
+function createApiClient(accessToken, isGraphql = true) {
+    try {
+        let client
+        if (isGraphql) {
+            client = new Shopify.Clients.Graphql(config.SHOP, accessToken)
+        } else {
+            client = new Shopify.Clients.Rest(config.SHOP, accessToken)
+        }
+        return client
     } catch (error) {
         console.error(error)
         throw new Error("Could not create Graphql client")
@@ -90,9 +134,11 @@ async function createApiClient(accessToken, isGraphql = true) {
 const shopifyService = {
     handleStoreUninstall,
     initContext,
-    registerUninstallHandler,
+    addUninstallHandler,
     createApiClient,
     Shopify,
+    addExistingHandlers,
+    reRegisterExistingWebhooks,
     // addAvailableTopicHandlers,
 }
 

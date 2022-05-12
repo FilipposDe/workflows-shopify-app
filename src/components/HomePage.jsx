@@ -35,7 +35,7 @@ import { capUnderscoreToCamelCase } from "../../util/topics"
 
 const initialData = {
     id: null,
-    webhookTopic: "PRODUCTS_CREATE",
+    topic: "PRODUCTS_CREATE",
     code: "console.log({data})",
 }
 
@@ -45,6 +45,7 @@ export function HomePage() {
     const [deleteLoading, setDeleteLoading] = useState(false)
     const [publishLoading, setPublishLoading] = useState(false)
     const [formError, setFormError] = useState("")
+    const [mode, setMode] = useState("CREATE")
 
     const {
         getWorkflows,
@@ -62,14 +63,14 @@ export function HomePage() {
 
         setSaveLoading(true)
         const body = {
-            webhookTopic: data.webhookTopic,
+            topic: data.topic,
             code: data.code,
         }
         let responseData
-        if (!data.id) {
+        if (mode === "CREATE") {
             responseData = await createWorkflow(body)
         } else {
-            responseData = await updateWorkflow(data.id, body)
+            responseData = await updateWorkflow(data.topic, body)
         }
         setSaveLoading(false)
         if (responseData.error) return setFormError(responseData.error)
@@ -80,20 +81,21 @@ export function HomePage() {
 
     const populateNewWorkflow = () => {
         setData(initialData)
+        setMode("CREATE")
     }
 
     const editWorkflow = (item) => {
         setData({
-            id: item.id,
-            webhookTopic: item.webhookTopic,
+            topic: item.topic,
             code: item.code,
         })
+        setMode("EDIT")
     }
 
     const deleteCurrentWorkflow = async () => {
         setFormError("")
         setDeleteLoading(true)
-        const responseData = await deleteWorkflow(data.id)
+        const responseData = await deleteWorkflow(data.topic)
         setDeleteLoading(false)
         if (responseData.error) return setFormError(responseData.error)
         setData(initialData)
@@ -103,13 +105,13 @@ export function HomePage() {
     const publishCurrentWorkflow = async () => {
         setFormError("")
         setPublishLoading(true)
-        const responseData = await publishWorkflow(data.id)
+        const responseData = await publishWorkflow(data.topic)
         setPublishLoading(false)
         if (responseData.error) return setFormError(responseData.error)
         workflowsRefetch()
     }
 
-    const usedTopics = workflows.map((item) => item.webhookTopic)
+    const usedTopics = workflows.map((item) => item.topic)
     const availableTopics = webhookTopics.filter(
         (item) => !usedTopics.includes(item)
     )
@@ -122,7 +124,7 @@ export function HomePage() {
                         <Card
                             sectioned
                             title={
-                                data.id
+                                mode === "EDIT"
                                     ? "Edit workflow"
                                     : "Create new workflow"
                             }
@@ -138,14 +140,12 @@ export function HomePage() {
                                 <Form onSubmit={() => saveWorkflow()}>
                                     <FormLayout>
                                         <FormLayout.Group>
-                                            {data.id ? (
+                                            {mode === "CREATE" ? (
                                                 <Select
                                                     label="Topic"
-                                                    options={[
-                                                        data.webhookTopic,
-                                                    ]}
+                                                    options={[data.topic]}
                                                     onChange={(v) => {}}
-                                                    value={data.webhookTopic}
+                                                    value={data.topic}
                                                     disabled
                                                 />
                                             ) : (
@@ -155,10 +155,10 @@ export function HomePage() {
                                                     onChange={(v) =>
                                                         setData({
                                                             ...data,
-                                                            webhookTopic: v,
+                                                            topic: v,
                                                         })
                                                     }
-                                                    value={data.webhookTopic}
+                                                    value={data.topic}
                                                 />
                                             )}
                                         </FormLayout.Group>
@@ -174,7 +174,7 @@ export function HomePage() {
                                                     fontSize: "14px",
                                                 }}
                                             >{`export default async function ${capUnderscoreToCamelCase(
-                                                data.webhookTopic
+                                                data.topic
                                             )}(data) {`}</code>
                                             <Editor
                                                 height="40vh"
@@ -222,7 +222,7 @@ export function HomePage() {
                                             >
                                                 Submit
                                             </Button>
-                                            {!!data.id && (
+                                            {mode === "EDIT" && (
                                                 <Button
                                                     outline
                                                     loading={publishLoading}
@@ -233,7 +233,7 @@ export function HomePage() {
                                                     Publish
                                                 </Button>
                                             )}
-                                            {!!data.id && (
+                                            {mode === "EDIT" && (
                                                 <Button
                                                     destructive
                                                     loading={deleteLoading}
