@@ -2,9 +2,10 @@ import path from "path"
 import fs from "fs"
 import eslint from "eslint"
 import { fileURLToPath, pathToFileURL } from "url"
-import { Workflows } from "./db.service.js"
+import dbService from "./db.service.js"
 import { capUnderscoreToCamelCase } from "../../util/topics.js"
 import ApiError from "../helpers/ApiError.js"
+const { Workflows } = dbService
 
 const DYNAMIC_IMPORTS = {}
 
@@ -93,13 +94,6 @@ function addFile(fileName, code) {
     }
 }
 
-function deleteFile(fileName, code) {
-    writeDynamicFile(fileName, code)
-    if (!lintDynamicFile(fileName)) {
-        throw new ApiError(400, "Found linting errors") // TODO
-    }
-}
-
 // async function publishFile(fileName, code) {
 //     writeDynamicFile(fileName, code)
 //     if (!lintDynamicFile(fileName)) {
@@ -109,25 +103,37 @@ function deleteFile(fileName, code) {
 //     return true
 // }
 
-async function initServerFiles() {
-    const allWorkflows = await Workflows.list()
-    const invalidWorkflows = []
-    for (const workflow of allWorkflows) {
-        const { topic, code } = workflow
-        const fileName = Workflows.getFileNameFromTopic(topic)
-        if (!dynamicFileExists(fileName)) {
-            writeDynamicFile(fileName, code)
-        }
-        if (!lintDynamicFile(fileName)) {
-            invalidWorkflows.push(workflow)
-            continue
-        }
-        await dynamicallyImportFile(fileName)
-    }
+function getImport(topic) {
+    const fileName = Workflows.getFileNameFromTopic(topic)
+    return DYNAMIC_IMPORTS[fileName]
 }
 
-function getImport(fileName) {
-    return DYNAMIC_IMPORTS[fileName]
+async function initServerFiles() {
+    try {
+        const allWorkflows = await Workflows.list()
+        // const invalidWorkflows = []
+        const validTopics = []
+        for (const workflow of allWorkflows) {
+            const { topic, code } = workflow
+            const fileName = Workflows.getFileNameFromTopic(topic)
+            if (!dynamicFileExists(fileName)) {
+                writeDynamicFile(fileName, code)
+            }
+            if (!lintDynamicFile(fileName)) {
+                // TODO
+                throw new Error(`Found invalid code in ${fileName}, exiting.`)
+                // invalidWorkflows.push(workflow)
+                // continue
+            }
+            validTopics.push(topic)
+            await dynamicallyImportFile(fileName)
+        }
+    } catch (error) {
+        console.error("Error initializing handler, exiting.", error)
+        process.exit()
+    }
+
+    return validTopics
 }
 
 async function getAllFiles() {
@@ -167,6 +173,8 @@ const dynamicFilesService = {
     deleteDynamicFile,
     lintDynamicFileAsync,
     getFunctionContents,
+    initServerFiles,
+    getImport,
 }
 
 export default dynamicFilesService

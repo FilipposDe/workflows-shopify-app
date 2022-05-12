@@ -33,9 +33,9 @@ async function cleanupTopicHandler(topic) {
     // 2. Remove handler from registry
     delete Shopify.Webhooks.Registry.webhookRegistry[topic]
     // 3. Remove handler from Dynamic Imports
-    files.deleteImport(topic)
-    // 4. Delete file
     const fileName = Workflows.getFileNameFromTopic(topic)
+    files.deleteImport(fileName)
+    // 4. Delete file
     try {
         files.deleteDynamicFile(fileName)
     } catch (error) {
