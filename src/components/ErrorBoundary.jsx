@@ -17,7 +17,7 @@ export default class ErrorBoundary extends React.Component {
     getMessage(error) {
         let result = ""
         if (error?.type === "APP::ERROR::INVALID_CONFIG") {
-            result += "Info: APP::ERROR::INVALID_CONFIG."
+            result += "Info: APP::ERROR::INVALID_CONFIG"
         }
         return result
     }

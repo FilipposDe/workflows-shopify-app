@@ -11,8 +11,27 @@ const { Settings } = dbService
 const authRoutes = express.Router()
 
 authRoutes.get(
+    "/install",
+    catchAsync(async (req, res) => {
+        // 1. Create a redirect URL and redirect to Shopify
+        console.log(DEBUG_MSG.BEGIN_OFFLINE_AUTH)
+        const IS_ONLINE = false
+        const redirectUrl = await Shopify.Auth.beginAuth(
+            req,
+            res,
+            req.query.shop,
+            "/auth/callback",
+            IS_ONLINE
+        )
+        console.log(DEBUG_MSG.OK_AUTH_REDIR_SHOPIFY)
+        res.redirect(redirectUrl)
+    })
+)
+
+authRoutes.get(
     "/",
     catchAsync(async (req, res) => {
+        // 1. Fix top level cookie
         console.log(DEBUG_MSG.CHECKING_TOP_COOKIE)
         const topLevelCookie = req.app.get("top-level-oauth-cookie")
         const reqHasTopLevelCookie = req.signedCookies[topLevelCookie]
@@ -24,8 +43,9 @@ authRoutes.get(
             return
         }
 
-        console.log(DEBUG_MSG.BEGIN_AUTH)
-        const IS_ONLINE = false
+        // 2. Create online redirect and redirect to Shopify
+        console.log(DEBUG_MSG.BEGIN_ONLINE_AUTH)
+        const IS_ONLINE = true
         const redirectUrl = await Shopify.Auth.beginAuth(
             req,
             res,
@@ -33,7 +53,6 @@ authRoutes.get(
             "/auth/callback",
             IS_ONLINE
         )
-
         console.log(DEBUG_MSG.OK_AUTH_REDIR_SHOPIFY)
         res.redirect(redirectUrl)
     })
@@ -62,55 +81,76 @@ authRoutes.get("/toplevel", (req, res) => {
 authRoutes.get(
     "/callback",
     catchAsync(async (req, res) => {
+        let isOnline
         try {
+            // 0. Validate the request
             console.log(DEBUG_MSG.VALIDATING_CB)
             const session = await Shopify.Auth.validateAuthCallback(
                 req,
                 res,
                 req.query
             )
+            isOnline = session.isOnline
 
-            console.log(DEBUG_MSG.STORING_IS_INSTALLED)
-            await Settings.put("isInstalled", true)
-            req.app.set("is-shop-installed", true)
+            if (!isOnline) {
+                // 1. Save installation to DB
+                console.log(DEBUG_MSG.STORING_IS_INSTALLED)
+                await Settings.put("isInstalled", true)
+                req.app.set("is-shop-installed", true)
 
-            console.log(DEBUG_MSG.REGISTERING_W_HOOKS)
-            const response = await Shopify.Webhooks.Registry.registerAll({
-                shop: session.shop,
-                accessToken: session.accessToken,
-                // topic: "APP_UNINSTALLED",
-                path: "/webhooks",
-            })
+                // 2. Register webhooks
+                console.log(DEBUG_MSG.REGISTERING_W_HOOKS)
+                const response = await Shopify.Webhooks.Registry.registerAll({
+                    shop: session.shop,
+                    accessToken: session.accessToken,
+                    // topic: "APP_UNINSTALLED",
+                    path: "/webhooks",
+                })
 
-            if (!response["APP_UNINSTALLED"].success) {
-                console.error(
-                    `Failed to register APP_UNINSTALLED webhook: ${response.result}`
-                )
-                throw new Error("Failed to register uninstall webhook")
-            }
-
-            console.log(DEBUG_MSG.FINISHED_REDIR_TO_APP)
-            // Redirect to app with shop parameter upon auth
-            res.redirect(`/?shop=${session.shop}&host=${req.query.host}`)
-        } catch (e) {
-            switch (true) {
-                case e instanceof Shopify.Errors.InvalidOAuthError:
-                    res.status(400)
-                    res.send(e.message)
-                    break
-                case e instanceof Shopify.Errors.CookieNotFound:
-                case e instanceof Shopify.Errors.SessionNotFound:
+                if (!response["APP_UNINSTALLED"].success) {
                     console.error(
-                        "Didn't find cookie or session, redirecting to /auth again..."
+                        `Failed to register APP_UNINSTALLED webhook: ${response.result}`
                     )
-                    // This is likely because the OAuth session cookie expired
-                    // before the merchant approved the request
-                    res.redirect(`/auth?shop=${req.query.shop}`)
+                    throw new Error("Failed to register uninstall webhook")
+                }
+
+                // 3. Redirect to online auth flow
+                console.log(DEBUG_MSG.FINISHED_REDIR_TO_ONLINE)
+                res.redirect(`/auth?shop=${session.shop}`)
+            } else {
+                // 1. Redirect to app with shop parameter upon auth
+                console.log(DEBUG_MSG.FINISHED_REDIR_TO_APP)
+                res.redirect(`/?shop=${session.shop}&host=${req.query.host}`)
+            }
+        } catch (error) {
+            switch (true) {
+                case error instanceof Shopify.Errors.InvalidOAuthError:
+                    res.status(400)
+                    res.send(error.message)
+                    break
+                case error instanceof Shopify.Errors.CookieNotFound:
+                case error instanceof Shopify.Errors.SessionNotFound:
+                    console.error(
+                        `Didn't find cookie or session, redirecting to ${
+                            isOnline ? "/auth" : "/auth/install"
+                        } again...`
+                    )
+                    // Likely because the session cookie has expired
+                    res.redirect(
+                        ` ${isOnline ? "/auth" : "/auth/install"}?shop=${
+                            req.query.shop
+                        }`
+                    )
                     break
                 default:
-                    console.error("Internal server error inside auth callback")
+                    console.error(
+                        `Internal server error inside ${
+                            isOnline ? "online" : "offline"
+                        } auth callback`,
+                        error
+                    )
                     res.status(500)
-                    res.send(e.message)
+                    res.send(error.message)
                     break
             }
         }
