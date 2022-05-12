@@ -13,24 +13,38 @@ import { Redirect } from "@shopify/app-bridge/actions"
 import { AppProvider as PolarisProvider } from "@shopify/polaris"
 import translations from "@shopify/polaris/locales/en.json"
 import "@shopify/polaris/build/esm/styles.css"
+import { ClientRouter } from "@shopify/app-bridge-react"
+import { BrowserRouter, Routes, Route } from "react-router-dom"
+
+function Router(props) {
+    const { history } = props
+    return <ClientRouter history={history} />
+}
 
 import { HomePage } from "./components/HomePage"
+import Workflow from "./Workflow"
 
 export default function App() {
     return (
-        <PolarisProvider i18n={translations}>
-            <AppBridgeProvider
-                config={{
-                    apiKey: process.env.SHOPIFY_API_KEY,
-                    host: new URL(location).searchParams.get("host"),
-                    forceRedirect: true,
-                }}
-            >
-                <MyProvider>
-                    <HomePage />
-                </MyProvider>
-            </AppBridgeProvider>
-        </PolarisProvider>
+        <BrowserRouter>
+            <PolarisProvider i18n={translations}>
+                <AppBridgeProvider
+                    config={{
+                        apiKey: process.env.SHOPIFY_API_KEY,
+                        host: new URL(location).searchParams.get("host"),
+                        forceRedirect: true,
+                    }}
+                >
+                    <MyProvider>
+                        <Router />
+                        <Routes>
+                            <Route path="/" element={<HomePage />} />
+                            <Route path="/:topic" element={<Workflow />} />
+                        </Routes>
+                    </MyProvider>
+                </AppBridgeProvider>
+            </PolarisProvider>
+        </BrowserRouter>
     )
 }
 

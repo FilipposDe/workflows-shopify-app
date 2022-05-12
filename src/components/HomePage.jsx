@@ -118,7 +118,11 @@ export function HomePage() {
 
     return (
         <Frame>
-            <Page fullWidth>
+            <Page
+                title="Workflows"
+                fullWidth
+                primaryAction={{ content: "New workflow" }}
+            >
                 <Layout>
                     <Layout.Section>
                         <Card
@@ -220,7 +224,7 @@ export function HomePage() {
                                                 primary
                                                 loading={saveLoading}
                                             >
-                                                Submit
+                                                Save
                                             </Button>
                                             {mode === "EDIT" && (
                                                 <Button
@@ -233,7 +237,7 @@ export function HomePage() {
                                                     Publish
                                                 </Button>
                                             )}
-                                            {mode === "EDIT" && (
+                                            {/* {mode === "EDIT" && (
                                                 <Button
                                                     destructive
                                                     loading={deleteLoading}
@@ -243,24 +247,15 @@ export function HomePage() {
                                                 >
                                                     Delete
                                                 </Button>
-                                            )}
+                                            )} */}
                                         </ButtonGroup>
                                     </FormLayout>
                                 </Form>
                             )}
                         </Card>
                     </Layout.Section>
-                    <Layout.Section secondary>
-                        <Card
-                            sectioned
-                            title="Workflows"
-                            actions={[
-                                {
-                                    content: "New",
-                                    onAction: () => populateNewWorkflow(),
-                                },
-                            ]}
-                        >
+                    <Layout.Section oneHalf>
+                        <Card sectioned title="All workflows">
                             {workflowsError && (
                                 <Banner
                                     title="Error getting workflows"
@@ -290,6 +285,7 @@ export function HomePage() {
                         </Card>
                     </Layout.Section>
                 </Layout>
+                <br />
             </Page>
         </Frame>
     )
