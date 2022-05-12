@@ -140,7 +140,7 @@ export function HomePage() {
                                 <Form onSubmit={() => saveWorkflow()}>
                                     <FormLayout>
                                         <FormLayout.Group>
-                                            {mode === "CREATE" ? (
+                                            {mode === "EDIT" ? (
                                                 <Select
                                                     label="Topic"
                                                     options={[data.topic]}

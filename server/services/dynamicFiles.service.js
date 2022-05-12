@@ -128,12 +128,12 @@ async function initServerFiles() {
             validTopics.push(topic)
             await dynamicallyImportFile(fileName)
         }
+
+        return validTopics
     } catch (error) {
         console.error("Error initializing handler, exiting.", error)
         process.exit()
     }
-
-    return validTopics
 }
 
 async function getAllFiles() {

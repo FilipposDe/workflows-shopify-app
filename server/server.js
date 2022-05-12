@@ -10,6 +10,7 @@ import webhookRoutes from "./routes/webhook.routes.js"
 import graphqlRoutes from "./routes/graphql.routes.js"
 import cspHeaders from "./middleware/csp-headers.js"
 import authRoutes from "./routes/auth.routes.js"
+import apiRoutes from "./routes/api.routes.js"
 import { errorConverter, errorHandler } from "./middleware/error.js"
 const { Settings } = dbService
 const { Shopify } = shopifyService
@@ -55,7 +56,7 @@ export async function createServer(
     app.use("/webhooks", webhookRoutes)
     app.use("/graphql", verifyRequest(app), graphqlRoutes)
     app.use(express.json())
-    // app.use("/api", verifyRequest(app), apiRoutes)
+    app.use("/api", verifyRequest(app), apiRoutes)
     app.use(cspHeaders())
     app.use("/*", isShopInstalled())
 

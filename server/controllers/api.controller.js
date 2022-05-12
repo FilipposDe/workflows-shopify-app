@@ -1,11 +1,12 @@
-import config from "../config"
-import ApiError from "../helpers/ApiError"
-import catchAsync from "../helpers/catchAsync"
-import { Workflows } from "../services/db.service.js"
-import shopifyService, { Shopify } from "../services/shopify.service.js"
+import config from "../config.js"
+import ApiError from "../helpers/ApiError.js"
+import catchAsync from "../helpers/catchAsync.js"
+import dbService from "../services/db.service.js"
+import shopifyService from "../services/shopify.service.js"
 import files from "../services/dynamicFiles.service.js"
 import { listTopicWebhooksQuery } from "../helpers/queries.js"
-
+const { Shopify } = shopifyService
+const { Workflows } = dbService
 // TODO continue work
 
 async function cleanupTopicHandler(topic) {
@@ -69,17 +70,14 @@ async function createTopicHandler(topic, code) {
 }
 
 const getWorkflows = catchAsync(async (req, res) => {
-    catchAsync(async (req, res) => {
-        const workflows = await Workflows.list()
-        for (const workflow of workflows) {
-            const fileName = Workflows.getFileNameFromTopic(workflow.topic)
-            workflow.fileIsValid = await files.lintDynamicFileAsync(fileName)
-            const fileContent = await files.getFunctionContents(fileName)
-            workflow.fileIsPublished =
-                fileContent.trim() === workflow.code.trim()
-        }
-        res.status(200).send(workflows)
-    })
+    const workflows = await Workflows.list()
+    for (const workflow of workflows) {
+        const fileName = Workflows.getFileNameFromTopic(workflow.topic)
+        workflow.fileIsValid = await files.lintDynamicFileAsync(fileName)
+        const fileContent = await files.getFunctionContents(fileName)
+        workflow.fileIsPublished = fileContent.trim() === workflow.code.trim()
+    }
+    res.status(200).send(workflows)
 })
 
 const createWorkflow = catchAsync(async (req, res) => {
