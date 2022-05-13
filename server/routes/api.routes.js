@@ -7,6 +7,8 @@ apiRoutes.get("/workflows", apiController.getWorkflows)
 
 apiRoutes.post("/workflows", apiController.createWorkflow)
 
+apiRoutes.get("/workflows/:topic", apiController.getWorkflow)
+
 apiRoutes.patch("/workflows/:topic", apiController.updateWorkflow)
 
 apiRoutes.post("/workflows/:topic/publish", apiController.publishWorkflow)

@@ -7,43 +7,59 @@ import {
 import {
     Provider as AppBridgeProvider,
     useAppBridge,
+    useClientRouting,
+    useNavigate,
 } from "@shopify/app-bridge-react"
 import { authenticatedFetch } from "@shopify/app-bridge-utils"
 import { Redirect } from "@shopify/app-bridge/actions"
 import { AppProvider as PolarisProvider } from "@shopify/polaris"
 import translations from "@shopify/polaris/locales/en.json"
 import "@shopify/polaris/build/esm/styles.css"
-import { ClientRouter } from "@shopify/app-bridge-react"
 import { BrowserRouter, Routes, Route } from "react-router-dom"
+import { HomePage } from "./components/HomePage"
+import Workflow from "./components/Workflow"
+import CreateWorkflow from "./components/CreateWorkflow"
+import ErrorBoundary from "./components/ErrorBoundary"
 
-function Router(props) {
-    const { history } = props
-    return <ClientRouter history={history} />
+function MyRouterInner(props) {
+    const navigate = useNavigate()
+    function replace(path) {
+        navigate(path)
+    }
+    useClientRouting({
+        replace,
+    })
+    return null
 }
 
-import { HomePage } from "./components/HomePage"
-import Workflow from "./Workflow"
+const MyRouter = MyRouterInner
 
 export default function App() {
     return (
         <BrowserRouter>
-            <PolarisProvider i18n={translations}>
-                <AppBridgeProvider
-                    config={{
-                        apiKey: process.env.SHOPIFY_API_KEY,
-                        host: new URL(location).searchParams.get("host"),
-                        forceRedirect: true,
-                    }}
-                >
-                    <MyProvider>
-                        <Router />
-                        <Routes>
-                            <Route path="/" element={<HomePage />} />
-                            <Route path="/:topic" element={<Workflow />} />
-                        </Routes>
-                    </MyProvider>
-                </AppBridgeProvider>
-            </PolarisProvider>
+            <ErrorBoundary>
+                <PolarisProvider i18n={translations}>
+                    <AppBridgeProvider
+                        config={{
+                            apiKey: process.env.SHOPIFY_API_KEY,
+                            host: new URL(location).searchParams.get("host"),
+                            forceRedirect: true,
+                        }}
+                    >
+                        <MyProvider>
+                            <Routes>
+                                <Route path="/" element={<HomePage />} />
+                                <Route
+                                    path="/new"
+                                    element={<CreateWorkflow />}
+                                />
+                                <Route path="/:topic" element={<Workflow />} />
+                            </Routes>
+                        </MyProvider>
+                        <MyRouter />
+                    </AppBridgeProvider>
+                </PolarisProvider>
+            </ErrorBoundary>
         </BrowserRouter>
     )
 }

@@ -26,7 +26,7 @@ const lintConfig = {
 async function dynamicallyImportFile(fileName) {
     const filePath = getDynamicFilePath(fileName)
     const fileUrl = pathToFileURL(filePath).toString()
-    const importedFn = await import(fileUrl)
+    const { default: importedFn } = await import(fileUrl)
     DYNAMIC_IMPORTS[fileName] = importedFn
     return importedFn
 }
@@ -111,9 +111,10 @@ function getImport(topic) {
 async function initServerFiles() {
     try {
         const allWorkflows = await Workflows.list()
+        const publishedWorkflows = allWorkflows.filter((item) => item.published)
         // const invalidWorkflows = []
         const validTopics = []
-        for (const workflow of allWorkflows) {
+        for (const workflow of publishedWorkflows) {
             const { topic, code } = workflow
             const fileName = Workflows.getFileNameFromTopic(topic)
             if (!dynamicFileExists(fileName)) {
@@ -175,6 +176,7 @@ const dynamicFilesService = {
     getFunctionContents,
     initServerFiles,
     getImport,
+    dynamicFileExists,
 }
 
 export default dynamicFilesService

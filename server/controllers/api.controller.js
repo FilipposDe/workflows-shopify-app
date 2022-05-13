@@ -73,11 +73,24 @@ const getWorkflows = catchAsync(async (req, res) => {
     const workflows = await Workflows.list()
     for (const workflow of workflows) {
         const fileName = Workflows.getFileNameFromTopic(workflow.topic)
+        if (!files.dynamicFileExists(fileName)) continue
         workflow.fileIsValid = await files.lintDynamicFileAsync(fileName)
         const fileContent = await files.getFunctionContents(fileName)
         workflow.fileIsPublished = fileContent.trim() === workflow.code.trim()
     }
     res.status(200).send(workflows)
+})
+
+const getWorkflow = catchAsync(async (req, res) => {
+    const { topic } = req.params
+    const workflow = await Workflows.findByTopic(topic)
+    const fileName = Workflows.getFileNameFromTopic(workflow.topic)
+    if (files.dynamicFileExists(fileName)) {
+        workflow.fileIsValid = await files.lintDynamicFileAsync(fileName)
+        const fileContent = await files.getFunctionContents(fileName)
+        workflow.fileIsPublished = fileContent.trim() === workflow.code.trim()
+    }
+    res.status(200).send(workflow)
 })
 
 const createWorkflow = catchAsync(async (req, res) => {
@@ -92,17 +105,23 @@ const updateWorkflow = catchAsync(async (req, res) => {
 
 const publishWorkflow = catchAsync(async (req, res) => {
     const workflow = await Workflows.findByTopic(req.params.topic)
+    await Workflows.update(workflow.topic, { published: true })
     await createTopicHandler(workflow.topic, workflow.code)
     res.status(200).send({ result: "success" })
 })
 
 const unpublishWorkflow = catchAsync(async (req, res) => {
+    const workflow = await Workflows.findByTopic(req.params.topic)
+    await Workflows.update(workflow.topic, { published: false })
     await cleanupTopicHandler(req.params.topic)
     res.status(200).send({ result: "success" })
 })
 
 const deleteWorkflow = catchAsync(async (req, res) => {
-    await cleanupTopicHandler(req.params.topic)
+    const workflow = await Workflows.findByTopic(req.params.topic)
+    if (workflow.published) {
+        await cleanupTopicHandler(req.params.topic)
+    }
     await Workflows.delete(req.params.topic)
     res.status(200).send({ result: "success" })
 })
@@ -114,6 +133,7 @@ const apiController = {
     publishWorkflow,
     unpublishWorkflow,
     deleteWorkflow,
+    getWorkflow,
 }
 
 export default apiController

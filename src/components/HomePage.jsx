@@ -24,107 +24,108 @@ import {
 import { useState } from "react"
 import { userLoggedInFetch } from "../App"
 
-import trophyImgUrl from "../assets/home-trophy.png"
-import useDataList from "../hooks/useDataList"
-import useWorkflows from "../hooks/useWorkflows"
-
 import { ProductsCard } from "./ProductsCard"
 import { WorkflowsList } from "./WorkflowsList"
 import { webhookTopics } from "./../../server/constants.js"
 import { capUnderscoreToCamelCase } from "../../util/topics"
+import useNav from "../hooks/useNav"
 
-const initialData = {
-    id: null,
-    topic: "PRODUCTS_CREATE",
-    code: "console.log({data})",
-}
+// const initialData = {
+//     id: null,
+//     topic: "PRODUCTS_CREATE",
+//     code: "console.log({data})",
+// }
 
 export function HomePage() {
-    const [data, setData] = useState(initialData)
-    const [saveLoading, setSaveLoading] = useState(false)
-    const [deleteLoading, setDeleteLoading] = useState(false)
-    const [publishLoading, setPublishLoading] = useState(false)
-    const [formError, setFormError] = useState("")
-    const [mode, setMode] = useState("CREATE")
+    // const [data, setData] = useState(initialData)
+    // const [saveLoading, setSaveLoading] = useState(false)
+    // const [deleteLoading, setDeleteLoading] = useState(false)
+    // const [publishLoading, setPublishLoading] = useState(false)
+    // const [formError, setFormError] = useState("")
+    // const [mode, setMode] = useState("CREATE")
 
-    const {
-        getWorkflows,
-        createWorkflow,
-        updateWorkflow,
-        deleteWorkflow,
-        publishWorkflow,
-    } = useWorkflows()
+    // const {
+    //     getWorkflows,
+    //     createWorkflow,
+    //     updateWorkflow,
+    //     deleteWorkflow,
+    //     publishWorkflow,
+    // } = useWorkflows()
 
-    const { workflows, workflowsLoading, workflowsError, workflowsRefetch } =
-        useDataList(getWorkflows, "workflows", [])
+    // console.log({ workflows, workflowsLoading, workflowsError })
 
-    const saveWorkflow = async () => {
-        setFormError("")
+    const nav = useNav()
 
-        setSaveLoading(true)
-        const body = {
-            topic: data.topic,
-            code: data.code,
-        }
-        let responseData
-        if (mode === "CREATE") {
-            responseData = await createWorkflow(body)
-        } else {
-            responseData = await updateWorkflow(data.topic, body)
-        }
-        setSaveLoading(false)
-        if (responseData.error) return setFormError(responseData.error)
+    // const saveWorkflow = async () => {
+    //     setFormError("")
 
-        setData(initialData)
-        workflowsRefetch()
-    }
+    //     setSaveLoading(true)
+    //     const body = {
+    //         topic: data.topic,
+    //         code: data.code,
+    //     }
+    //     let responseData
+    //     if (mode === "CREATE") {
+    //         responseData = await createWorkflow(body)
+    //     } else {
+    //         responseData = await updateWorkflow(data.topic, body)
+    //     }
+    //     setSaveLoading(false)
+    //     if (responseData.error) return setFormError(responseData.error)
 
-    const populateNewWorkflow = () => {
-        setData(initialData)
-        setMode("CREATE")
-    }
+    //     setData(initialData)
+    //     workflowsRefetch()
+    // }
 
-    const editWorkflow = (item) => {
-        setData({
-            topic: item.topic,
-            code: item.code,
-        })
-        setMode("EDIT")
-    }
+    // const populateNewWorkflow = () => {
+    //     setData(initialData)
+    //     setMode("CREATE")
+    // }
 
-    const deleteCurrentWorkflow = async () => {
-        setFormError("")
-        setDeleteLoading(true)
-        const responseData = await deleteWorkflow(data.topic)
-        setDeleteLoading(false)
-        if (responseData.error) return setFormError(responseData.error)
-        setData(initialData)
-        workflowsRefetch()
-    }
+    // const editWorkflow = (item) => {
+    //     setData({
+    //         topic: item.topic,
+    //         code: item.code,
+    //     })
+    //     setMode("EDIT")
+    // }
 
-    const publishCurrentWorkflow = async () => {
-        setFormError("")
-        setPublishLoading(true)
-        const responseData = await publishWorkflow(data.topic)
-        setPublishLoading(false)
-        if (responseData.error) return setFormError(responseData.error)
-        workflowsRefetch()
-    }
+    // const deleteCurrentWorkflow = async () => {
+    //     setFormError("")
+    //     setDeleteLoading(true)
+    //     const responseData = await deleteWorkflow(data.topic)
+    //     setDeleteLoading(false)
+    //     if (responseData.error) return setFormError(responseData.error)
+    //     setData(initialData)
+    //     workflowsRefetch()
+    // }
 
-    const usedTopics = workflows.map((item) => item.topic)
-    const availableTopics = webhookTopics.filter(
-        (item) => !usedTopics.includes(item)
-    )
+    // const publishCurrentWorkflow = async () => {
+    //     setFormError("")
+    //     setPublishLoading(true)
+    //     const responseData = await publishWorkflow(data.topic)
+    //     setPublishLoading(false)
+    //     if (responseData.error) return setFormError(responseData.error)
+    //     workflowsRefetch()
+    // }
+
+    // const usedTopics = workflows?.map((item) => item.topic) || []
+    // const availableTopics = webhookTopics.filter(
+    //     (item) => !usedTopics.includes(item)
+    // )
 
     return (
         <Frame>
             <Page
                 title="Workflows"
                 fullWidth
-                primaryAction={{ content: "New workflow" }}
+                primaryAction={{
+                    content: "New workflow",
+                    onAction: () => nav("/new"),
+                }}
             >
                 <Layout>
-                    <Layout.Section>
+                    {/* <Layout.Section>
                         <Card
                             sectioned
                             title={
@@ -237,53 +238,19 @@ export function HomePage() {
                                                     Publish
                                                 </Button>
                                             )}
-                                            {/* {mode === "EDIT" && (
-                                                <Button
-                                                    destructive
-                                                    loading={deleteLoading}
-                                                    onClick={
-                                                        deleteCurrentWorkflow
-                                                    }
-                                                >
-                                                    Delete
-                                                </Button>
-                                            )} */}
+                                            
                                         </ButtonGroup>
                                     </FormLayout>
                                 </Form>
                             )}
                         </Card>
-                    </Layout.Section>
+                    </Layout.Section> */}
                     <Layout.Section oneHalf>
                         <Card sectioned title="All workflows">
-                            {workflowsError && (
-                                <Banner
-                                    title="Error getting workflows"
-                                    status="critical"
-                                >
-                                    <p>{workflowsError}</p>
-                                </Banner>
-                            )}
-                            {workflowsLoading && (
-                                <Stack distribution="center">
-                                    <Spinner
-                                        accessibilityLabel="Workflows loading..."
-                                        size="large"
-                                    />
-                                </Stack>
-                            )}
-                            {workflows && !workflowsLoading && (
-                                <WorkflowsList
-                                    workflows={workflows}
-                                    workflowsLoading={workflowsLoading}
-                                    onEdit={editWorkflow}
-                                />
-                            )}
-
-                            {/*  */}
-                            {/*  */}
+                            <WorkflowsList />
                         </Card>
                     </Layout.Section>
+                    <Layout.Section oneHalf></Layout.Section>
                 </Layout>
                 <br />
             </Page>
