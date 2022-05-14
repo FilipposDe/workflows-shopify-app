@@ -29,6 +29,8 @@ import useFetch from "../hooks/useFetch"
 import useNav from "../hooks/useNav"
 import CodeEditor from "./CodeEditor"
 import CustomModal from "./CustomModal"
+import WorkflowStatus from "./WorkflowStatus"
+import useToast from "../hooks/useToast"
 
 function Workflow() {
     const { topic } = useParams()
@@ -42,6 +44,10 @@ function Workflow() {
 
     const fetch = useFetch()
     const nav = useNav()
+
+    const { setToast, toastHtml } = useToast()
+
+    const [loadingStates, setLoadingStates] = useState({})
 
     // const [deleteLoading, setDeleteLoading] = useState(false)
     // const [publishLoading, setPublishLoading] = useState(false)
@@ -83,12 +89,17 @@ function Workflow() {
         nav("/")
     }
 
-    const publishWorkflow = async () => {
-        setFormError("")
-        setPublishLoading(true)
-        const { error } = await fetch(`/api/workflows/${topic}/publish`, "POST")
-        setPublishLoading(false)
-        if (error) return setFormError(error)
+    const togglePublishWorkflow = async () => {
+        setLoadingStates({ ...loadingStates, publish: true })
+        const { error } = await fetch(
+            `/api/workflows/${workflow.topic}/${
+                workflow.published ? "unpublish" : "publish"
+            }`,
+            "POST"
+        )
+        setLoadingStates({ ...loadingStates, publish: false })
+        if (error) return setToast(error, true)
+        setToast(workflow.published ? "Unpublished" : "Published")
         workflowRefetch()
     }
 
@@ -120,6 +131,7 @@ function Workflow() {
 
     return (
         <Frame>
+            {toastHtml}
             <Page
                 title={workflow?.topic}
                 fullWidth
@@ -137,24 +149,16 @@ function Workflow() {
                         outline: true,
                     },
                     {
-                        content: workflow?.fileIsPublished
-                            ? "Unpublish"
-                            : "Publish",
-                        onAction: () =>
-                            workflow?.fileIsPublished
-                                ? publishWorkflow()
-                                : publishWorkflow(),
+                        content: workflow?.published ? "Unpublish" : "Publish",
+                        onAction: () => togglePublishWorkflow(),
+                        loading: loadingStates.publish,
                     },
                 ]}
                 breadcrumbs={[
                     { content: "Workflows", onAction: () => nav("/") },
                 ]}
                 titleMetadata={
-                    workflow?.fileIsPublished ? (
-                        <Badge status="success">Published</Badge>
-                    ) : (
-                        <Badge status="critical">Unpublished</Badge>
-                    )
+                    workflow ? <WorkflowStatus workflow={workflow} /> : null
                 }
             >
                 <Layout>

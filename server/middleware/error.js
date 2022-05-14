@@ -30,7 +30,7 @@ export const errorHandler = (err, req, res, next) => {
     }
 
     if (process.env.NODE_ENV === "development") {
-        logger.error(err)
+        console.error(err)
     }
 
     res.status(statusCode).send(response)

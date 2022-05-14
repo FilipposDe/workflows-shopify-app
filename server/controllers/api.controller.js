@@ -16,11 +16,11 @@ async function cleanupTopicHandler(topic) {
     const clientG = shopifyService.createApiClient(offlineSession.accessToken)
     const allTopicWebhooksQuery = listTopicWebhooksQuery(topic)
     const result = await clientG.query({ data: allTopicWebhooksQuery })
-    if (!result?.data?.webhookSubscriptions?.edges?.length) {
+    if (!result?.body?.data?.webhookSubscriptions?.edges?.length) {
         // TODO it's okay if there's none, not okay if there are errors
         throw new ApiError(404, "Could not find this webhook on Shopify")
     }
-    const ids = result.data.webhookSubscriptions.edges.map(
+    const ids = result.body.data.webhookSubscriptions.edges.map(
         (edge) => edge.node.id
     )
     const clientR = shopifyService.createApiClient(
@@ -29,7 +29,10 @@ async function cleanupTopicHandler(topic) {
     )
     for await (const id of ids) {
         await clientR.delete({
-            path: `webhooks/${id}`,
+            path: `webhooks/${id.replace(
+                "gid://shopify/WebhookSubscription/",
+                ""
+            )}`,
         })
     }
     // 2. Remove handler from registry
@@ -113,8 +116,8 @@ const publishWorkflow = catchAsync(async (req, res) => {
 
 const unpublishWorkflow = catchAsync(async (req, res) => {
     const workflow = await Workflows.findByTopic(req.params.topic)
-    await Workflows.update(workflow.topic, { published: false })
     await cleanupTopicHandler(req.params.topic)
+    await Workflows.update(workflow.topic, { published: false })
     res.status(200).send({ result: "success" })
 })
 

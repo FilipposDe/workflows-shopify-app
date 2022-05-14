@@ -1,4 +1,5 @@
 import shopifyService from "../services/shopify.service.js"
+import catchAsync from "../helpers/catchAsync.js"
 const { Shopify } = shopifyService
 
 const TEST_GRAPHQL_QUERY = `
@@ -28,7 +29,7 @@ async function isSessionValidForApi(session) {
 }
 
 export default function verifyRequest(_app, opts = {}) {
-    return async (req, res, next) => {
+    return catchAsync(async (req, res, next) => {
         const IS_ONLINE = true
         const session = await Shopify.Utils.loadCurrentSession(
             req,
@@ -95,5 +96,5 @@ export default function verifyRequest(_app, opts = {}) {
             `/auth?shop=${finalShop}`
         )
         res.end()
-    }
+    })
 }

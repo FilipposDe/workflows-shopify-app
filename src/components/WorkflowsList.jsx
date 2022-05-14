@@ -1,26 +1,26 @@
-import { useEffect, useState } from "react"
 import {
     Button,
-    Heading,
-    TextContainer,
-    DisplayText,
     TextStyle,
-    Spinner,
     Banner,
     Stack,
-    Badge,
     ResourceList,
     ResourceItem,
 } from "@shopify/polaris"
-import { Toast, useAppBridge } from "@shopify/app-bridge-react"
-import { gql, useMutation } from "@apollo/client"
 import useNav from "../hooks/useNav"
 import useData from "../hooks/useData"
 import useFetch from "../hooks/useFetch"
+import WorkflowStatus from "./WorkflowStatus"
+import useToast from "../hooks/useToast"
+import { useState } from "react"
 
-export function WorkflowsList(props) {
+export function WorkflowsList() {
     const nav = useNav()
     const fetch = useFetch()
+
+    const { setToast, toastHtml } = useToast()
+
+    const [loadingStates, setLoadingStates] = useState({})
+    // const [errorStates, setErrorStates] = useState({})
 
     const { workflows, workflowsLoading, workflowsError, workflowsRefetch } =
         useData(`/api/workflows`, {
@@ -28,55 +28,18 @@ export function WorkflowsList(props) {
             defaultValue: [],
         })
 
-    const publishWorkflow = async (workflow) => {
-        // setFormError("")
-        // setPublishLoading(true)
+    const togglePublishWorkflow = async (workflow) => {
+        setLoadingStates({ ...loadingStates, publish: true })
         const { error } = await fetch(
-            `/api/workflows/${workflow.topic}/publish`,
+            `/api/workflows/${workflow.topic}/${
+                workflow.published ? "unpublish" : "publish"
+            }`,
             "POST"
         )
-        // setPublishLoading(false)
-        // if (error) return setFormError(error)
+        setLoadingStates({ ...loadingStates, publish: false })
+        if (error) return setToast(error, true)
+        setToast(workflow.published ? "Unpublished" : "Published")
         workflowsRefetch()
-    }
-
-    function renderItem(item) {
-        const { topic, fileIsPublished, fileIsValid, published } = item
-        const shortcutActions = [
-            {
-                content: published ? "Unpublish" : "Publish",
-                onAction: () => publishWorkflow(item),
-                monochrome: true,
-            },
-        ]
-        return (
-            <ResourceItem
-                id={topic}
-                onClick={() => nav(`/${item.topic}`)}
-                shortcutActions={shortcutActions}
-            >
-                <h3>
-                    <TextStyle variation="strong">{topic}</TextStyle>
-                </h3>
-                <Stack>
-                    {fileIsValid ? (
-                        <Badge status="success">Valid code</Badge>
-                    ) : (
-                        <Badge status="critical">Invalid code</Badge>
-                    )}
-                    {published ? (
-                        <Badge status="success">Published</Badge>
-                    ) : (
-                        <Badge status="critical">Unpublished</Badge>
-                    )}
-                    {fileIsPublished ? (
-                        <Badge status="success">Up to date</Badge>
-                    ) : (
-                        <Badge status="critical">Outdated file</Badge>
-                    )}
-                </Stack>
-            </ResourceItem>
-        )
     }
 
     if (workflowsError) {
@@ -90,16 +53,29 @@ export function WorkflowsList(props) {
         )
     }
 
-    // if (workflowsLoading)  {
-    //     return (
-    //         <Stack distribution="center">
-    //             <Spinner
-    //                 accessibilityLabel="Workflows loading..."
-    //                 size="large"
-    //             />
-    //         </Stack>
-    //     )
-    // }
+    const renderItem = (item) => {
+        const { topic, published } = item
+        const shortcutActions = [
+            {
+                content: published ? "Unpublish" : "Publish",
+                onAction: () => togglePublishWorkflow(item),
+                monochrome: true,
+                loading: loadingStates.publish,
+            },
+        ]
+        return (
+            <ResourceItem
+                id={topic}
+                onClick={() => nav(`/${item.topic}`)}
+                shortcutActions={shortcutActions}
+            >
+                <h3>
+                    <TextStyle variation="strong">{topic}</TextStyle>
+                </h3>
+                <WorkflowStatus workflow={item} />
+            </ResourceItem>
+        )
+    }
 
     const emptyState = (
         <Stack alignment="center">
@@ -111,17 +87,19 @@ export function WorkflowsList(props) {
     )
 
     return (
-        <ResourceList
-            emptyState={emptyState}
-            resourceName={{
-                singular: "workflow",
-                plural: "workflows",
-            }}
-            loading={workflowsLoading}
-            items={workflows}
-            selectable={false}
-            renderItem={renderItem}
-            // filterControl={filterControl}
-        />
+        <>
+            {toastHtml}
+            <ResourceList
+                emptyState={emptyState}
+                resourceName={{
+                    singular: "workflow",
+                    plural: "workflows",
+                }}
+                loading={workflowsLoading}
+                items={workflows}
+                selectable={false}
+                renderItem={renderItem}
+            />
+        </>
     )
 }

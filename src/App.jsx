@@ -21,19 +21,6 @@ import Workflow from "./components/Workflow"
 import CreateWorkflow from "./components/CreateWorkflow"
 import ErrorBoundary from "./components/ErrorBoundary"
 
-function MyRouterInner(props) {
-    const navigate = useNavigate()
-    function replace(path) {
-        navigate(path)
-    }
-    useClientRouting({
-        replace,
-    })
-    return null
-}
-
-const MyRouter = MyRouterInner
-
 export default function App() {
     return (
         <BrowserRouter>
@@ -56,12 +43,23 @@ export default function App() {
                                 <Route path="/:topic" element={<Workflow />} />
                             </Routes>
                         </MyProvider>
-                        <MyRouter />
+                        <ShopifyRouterFix />
                     </AppBridgeProvider>
                 </PolarisProvider>
             </ErrorBoundary>
         </BrowserRouter>
     )
+}
+
+function ShopifyRouterFix() {
+    const navigate = useNavigate()
+    function replace(path) {
+        navigate(path)
+    }
+    useClientRouting({
+        replace,
+    })
+    return null
 }
 
 function MyProvider({ children }) {
