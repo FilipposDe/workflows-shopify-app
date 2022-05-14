@@ -58,21 +58,23 @@ export function WorkflowsList(props) {
                 <h3>
                     <TextStyle variation="strong">{topic}</TextStyle>
                 </h3>
-                {fileIsValid ? (
-                    <Badge status="success">Valid code</Badge>
-                ) : (
-                    <Badge status="critical">Invalid code</Badge>
-                )}
-                {published ? (
-                    <Badge status="success">Published</Badge>
-                ) : (
-                    <Badge status="critical">Unpublished</Badge>
-                )}
-                {fileIsPublished ? (
-                    <Badge status="success">Up to date</Badge>
-                ) : (
-                    <Badge status="critical">Outdated file</Badge>
-                )}
+                <Stack>
+                    {fileIsValid ? (
+                        <Badge status="success">Valid code</Badge>
+                    ) : (
+                        <Badge status="critical">Invalid code</Badge>
+                    )}
+                    {published ? (
+                        <Badge status="success">Published</Badge>
+                    ) : (
+                        <Badge status="critical">Unpublished</Badge>
+                    )}
+                    {fileIsPublished ? (
+                        <Badge status="success">Up to date</Badge>
+                    ) : (
+                        <Badge status="critical">Outdated file</Badge>
+                    )}
+                </Stack>
             </ResourceItem>
         )
     }
