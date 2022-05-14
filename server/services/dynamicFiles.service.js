@@ -5,6 +5,7 @@ import { fileURLToPath, pathToFileURL } from "url"
 import dbService from "./db.service.js"
 import { capUnderscoreToCamelCase } from "../../util/topics.js"
 import ApiError from "../helpers/ApiError.js"
+import logger from "../logger.js"
 const { Workflows } = dbService
 
 const DYNAMIC_IMPORTS = {}
@@ -56,7 +57,7 @@ function deleteDynamicFile(fileName) {
         const filePath = getDynamicFilePath(fileName)
         fs.unlinkSync(filePath)
     } catch (error) {
-        console.error(error)
+        logger.error(error)
         throw new Error(`Failed to delete file ${fileName}`)
     }
 }
@@ -132,7 +133,7 @@ async function initServerFiles() {
 
         return validTopics
     } catch (error) {
-        console.error("Error initializing handler, exiting.", error)
+        logger.error("Error initializing handler, exiting.", error)
         process.exit()
     }
 }

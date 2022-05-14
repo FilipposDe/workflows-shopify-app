@@ -28,6 +28,13 @@ function initDB() {
     storage = getStorage()
 }
 
+async function count(collection) {
+    const collectionRef = await firestore.collection(collection)
+    const querySnapshot = await collectionRef.get()
+    const size = await querySnapshot.size
+    return size
+}
+
 async function list(collection) {
     const collectionRef = await firestore.collection(collection)
     const querySnapshot = await collectionRef.get()
@@ -38,7 +45,24 @@ async function list(collection) {
 
 async function findById(id, collection) {
     const ref = await firestore.doc(`${collection}/${id}`)
-    const data = await (await ref.get()).data()
+    const doc = await ref.get()
+    const data = await doc.data()
+    return data
+}
+
+async function find(conditions, collection) {
+    if (!conditions) {
+        const all = await list(collection)
+        return all
+    }
+    if (conditions.length > 1) {
+        throw new Error("Only one condition supported")
+    }
+    const [field, operand, value] = conditions[0]
+    const collectionRef = await firestore.collection(collection)
+    const querySnapshot = await collectionRef.where(field, operand, value)
+    const docs = await querySnapshot.docs
+    const data = docs.map((doc) => ({ ...doc.data(), id: doc.id }))
     return data
 }
 
@@ -78,14 +102,31 @@ async function deleteById(id, collection) {
     await ref.delete()
 }
 
+async function deleteFromEnd(orderBy, count, collection) {
+    const collectionRef = await firestore.collection(collection)
+    const docs = await collectionRef
+        .orderBy(orderBy, "desc")
+        .limitToLast(count)
+        .get()
+    let batch = firestore.batch()
+    docs.forEach((doc) => {
+        console.log(doc.id)
+        batch.delete(doc.ref)
+    })
+    await batch.commit()
+}
+
 const db = {
     initDB,
     findById,
+    find,
     create,
     updateById,
     deleteById,
     findFirst,
     list,
+    count,
+    deleteFromEnd,
 }
 
 const firebaseService = {

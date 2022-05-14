@@ -1,5 +1,6 @@
 import { Shopify } from "@shopify/shopify-api"
 import crypto from "crypto"
+import logger from "../logger.js"
 import dbService from "../services/db.service.js"
 const { Session } = dbService
 
@@ -51,7 +52,7 @@ const storeCallback = async (session) => {
         }
         return true
     } catch (error) {
-        console.error("Session create/update error", error)
+        logger.error("Session create/update error", error)
         return false
     }
 }
@@ -69,7 +70,7 @@ const loadCallback = async (id) => {
         }
         return undefined
     } catch (error) {
-        console.error("Session read error", error)
+        logger.error("Session read error", error)
         return undefined
     }
 }
@@ -79,7 +80,7 @@ const deleteCallback = async (id) => {
         await Session.deleteById(id)
         return true
     } catch (error) {
-        console.error("Session delete error", error)
+        logger.error("Session delete error", error)
         return false
     }
 }

@@ -1,5 +1,6 @@
 import { Shopify } from "@shopify/shopify-api"
 import topLevelAuthRedirect from "../helpers/top-level-auth-redirect.js"
+import logger from "../logger.js"
 import dbService from "../services/db.service.js"
 const { Settings } = dbService
 
@@ -81,7 +82,7 @@ export default function applyAuthMiddleware(app) {
             })
 
             if (!response["APP_UNINSTALLED"].success) {
-                console.error(
+                logger.error(
                     `Failed to register APP_UNINSTALLED webhook: ${response.result}`
                 )
             }

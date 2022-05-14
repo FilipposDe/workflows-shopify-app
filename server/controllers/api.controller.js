@@ -5,6 +5,7 @@ import dbService from "../services/db.service.js"
 import shopifyService from "../services/shopify.service.js"
 import files from "../services/dynamicFiles.service.js"
 import { listTopicWebhooksQuery } from "../helpers/queries.js"
+import logger from "../logger.js"
 const { Shopify } = shopifyService
 const { Workflows } = dbService
 // TODO continue work
@@ -40,7 +41,7 @@ async function cleanupTopicHandler(topic) {
     try {
         files.deleteDynamicFile(fileName)
     } catch (error) {
-        console.error(error)
+        logger.error(error)
     }
 }
 
@@ -64,7 +65,7 @@ async function createTopicHandler(topic, code) {
         shop: config.SHOP,
     })
     if (!response[topic].success) {
-        console.error(response.result)
+        logger.error(response.result)
         throw new ApiError(500, `Failed to register ${topic} webhook`)
     }
 }

@@ -1,3 +1,4 @@
+import logger from "../logger.js"
 import ApiError from "./../helpers/ApiError.js"
 
 export const errorConverter = (err, req, res, next) => {
@@ -29,7 +30,7 @@ export const errorHandler = (err, req, res, next) => {
     }
 
     if (process.env.NODE_ENV === "development") {
-        console.error(err)
+        logger.error(err)
     }
 
     res.status(statusCode).send(response)

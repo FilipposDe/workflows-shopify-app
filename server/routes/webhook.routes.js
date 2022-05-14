@@ -1,4 +1,5 @@
 import express from "express"
+import logger from "../logger.js"
 import shopifyService from "../services/shopify.service.js"
 const { Shopify } = shopifyService
 
@@ -9,7 +10,7 @@ webhookRoutes.post("/", async (req, res) => {
         await Shopify.Webhooks.Registry.process(req, res)
         console.log(`Webhook processed, returned status code 200`)
     } catch (error) {
-        console.error(`Failed to process webhook: ${error}`)
+        logger.error(`Failed to process webhook: ${error}`)
         if (!res.headersSent) {
             res.status(500).send(error.message)
         }

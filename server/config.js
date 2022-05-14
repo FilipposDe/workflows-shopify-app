@@ -1,5 +1,6 @@
 import "dotenv/config"
 import { ApiVersion } from "@shopify/shopify-api"
+
 const optionalEnvVars = ["PORT", "VITE_TEST_BUILD"]
 
 const requiredEnvVars = [

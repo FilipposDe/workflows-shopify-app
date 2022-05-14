@@ -12,6 +12,7 @@ import cspHeaders from "./middleware/csp-headers.js"
 import authRoutes from "./routes/auth.routes.js"
 import apiRoutes from "./routes/api.routes.js"
 import { errorConverter, errorHandler } from "./middleware/error.js"
+import logger from "./logger.js"
 const { Settings } = dbService
 const { Shopify } = shopifyService
 const router = express.Router()
@@ -38,7 +39,7 @@ async function setServerSettings(app) {
     try {
         isShopInstalled = await Settings.get("isInstalled")
     } catch (error) {
-        console.error("Error while setting up express.js, exiting", error)
+        logger.error("Error while setting up express.js, exiting", error)
         process.exit(1)
     }
     app.set("top-level-oauth-cookie", config.TOP_LEVEL_OAUTH_COOKIE)

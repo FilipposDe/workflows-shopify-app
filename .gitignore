@@ -21,4 +21,5 @@ config/tunnel.pid
 # webpack build output
 dist/
 
-/storage/
+/storage/*
+!/storage/.empty

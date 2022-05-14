@@ -20,9 +20,27 @@ async function findDocById(id, collection) {
     }
 }
 
+async function countCollection(collection) {
+    try {
+        return await firebaseService.db.count(collection)
+    } catch (error) {
+        console.error("DB Error", error)
+        throw new Error("DB Error")
+    }
+}
+
 async function listCollection(collection) {
     try {
         return await firebaseService.db.list(collection)
+    } catch (error) {
+        console.error("DB Error", error)
+        throw new Error("DB Error")
+    }
+}
+
+async function findDocs(conditions, collection) {
+    try {
+        return await firebaseService.db.find(conditions, collection)
     } catch (error) {
         console.error("DB Error", error)
         throw new Error("DB Error")
@@ -56,6 +74,19 @@ async function deleteDocById(id, collection) {
     }
 }
 
+async function deleteDocsFromEnd(orderBy, count, collection) {
+    try {
+        return await firebaseService.db.deleteFromEnd(
+            orderBy,
+            count,
+            collection
+        )
+    } catch (error) {
+        console.error("DB Error", error)
+        throw new Error("DB Error")
+    }
+}
+
 async function findFirstDoc(collection) {
     try {
         return await firebaseService.db.findFirst(collection)
@@ -63,6 +94,21 @@ async function findFirstDoc(collection) {
         console.error("DB Error", error)
         throw new Error("DB Error")
     }
+}
+
+const Logs = {
+    async create(body) {
+        return await createDoc(body, "logs", false)
+    },
+    async find(conditions) {
+        return await findDocs(conditions, "logs")
+    },
+    async count() {
+        return await countCollection("logs")
+    },
+    async deleteEntriesFromEnd(count) {
+        return await deleteDocsFromEnd("date", count, "logs")
+    },
 }
 
 const Session = {
@@ -132,6 +178,7 @@ const dbService = {
     Session,
     Workflows,
     Settings,
+    Logs,
 }
 
 export default dbService

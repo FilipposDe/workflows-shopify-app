@@ -1,6 +1,7 @@
 import { Shopify } from "@shopify/shopify-api"
 import config from "../config.js"
 import sessionStorage from "../helpers/sessionStorage.js"
+import logger from "../logger.js"
 // import { webhookTopics } from "../constants.js"
 import dbService from "./db.service.js"
 const { Settings, Session } = dbService
@@ -15,7 +16,7 @@ async function handleStoreUninstall() {
         }
         console.log("App: Store uninstalled, cleared all sessions")
     } catch (error) {
-        console.error("DB error while handling store uninstall", error)
+        logger.error("DB error while handling store uninstall", error)
     }
 }
 
@@ -32,7 +33,7 @@ function initContext() {
         })
         console.log("App: Initialized Shopify Context")
     } catch (error) {
-        console.error("Error during Shopify Context init, exiting.", error)
+        logger.error("Error during Shopify Context init, exiting.", error)
         process.exit(1)
     }
 }
@@ -46,7 +47,7 @@ function addExistingHandlers(topics, getHandler) {
             })
         }
     } catch (error) {
-        console.error(
+        logger.error(
             "Error while registering existing webhooks, exiting.",
             error
         )
@@ -63,7 +64,7 @@ function addUninstallHandler() {
         })
         console.log("App: Registered uninstall webhook")
     } catch (error) {
-        console.error(
+        logger.error(
             "Error while registering APP_UNINSTALLED webhook, exiting.",
             error
         )
@@ -85,14 +86,14 @@ async function reRegisterExistingWebhooks() {
         const addedTopics = Shopify.Webhooks.Registry.getTopics()
         for (const topic of addedTopics) {
             if (!response[topic].success) {
-                console.error(response.result)
+                logger.error(response.result)
                 throw new Error(`Failed to register ${topic} webhook`)
             }
         }
 
         console.log("App: Re-registered existing webhooks")
     } catch (error) {
-        console.error("Error while registering webhooks, exiting.", error)
+        logger.error("Error while registering webhooks, exiting.", error)
         process.exit(1)
     }
 }
@@ -107,7 +108,7 @@ function createApiClient(accessToken, isGraphql = true) {
         }
         return client
     } catch (error) {
-        console.error(error)
+        logger.error(error)
         throw new Error("Could not create Graphql client")
     }
 }

@@ -4,6 +4,7 @@ import catchAsync from "../helpers/catchAsync.js"
 import topLevelAuthRedirect from "../helpers/top-level-auth-redirect.js"
 import dbService from "../services/db.service.js"
 import shopifyService from "../services/shopify.service.js"
+import logger from "../logger.js"
 const { Shopify } = shopifyService
 const { Settings } = dbService
 
@@ -107,7 +108,7 @@ authRoutes.get(
                 })
 
                 if (!response["APP_UNINSTALLED"].success) {
-                    console.error(
+                    logger.error(
                         `Failed to register APP_UNINSTALLED webhook: ${response.result}`
                     )
                     throw new Error("Failed to register uninstall webhook")
@@ -129,7 +130,7 @@ authRoutes.get(
                     break
                 case error instanceof Shopify.Errors.CookieNotFound:
                 case error instanceof Shopify.Errors.SessionNotFound:
-                    console.error(
+                    logger.error(
                         `Didn't find cookie or session, redirecting to ${
                             isOnline ? "/auth" : "/auth/install"
                         } again...`
@@ -142,7 +143,7 @@ authRoutes.get(
                     )
                     break
                 default:
-                    console.error(
+                    logger.error(
                         `Internal server error inside ${
                             isOnline ? "online" : "offline"
                         } auth callback`,
