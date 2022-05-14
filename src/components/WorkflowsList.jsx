@@ -90,7 +90,7 @@ export function WorkflowsList(props) {
         )
     }
 
-    // if (workflowsLoading)  {
+    // if (workflowsLoading)   {
     //     return (
     //         <Stack distribution="center">
     //             <Spinner
