@@ -24,13 +24,15 @@ import {
 import useData from "../hooks/useData"
 import { capUnderscoreToCamelCase } from "../../util/topics"
 import Editor from "@monaco-editor/react"
-import { useState } from "react"
+import React, { Suspense, useState } from "react"
 import useFetch from "../hooks/useFetch"
 import useNav from "../hooks/useNav"
-import CodeEditor from "./CodeEditor"
+// import CodeEditor from "./CodeEditor"
 import CustomModal from "./CustomModal"
 import WorkflowStatus from "./WorkflowStatus"
 import useToast from "../hooks/useToast"
+import { codeDecode, codeEncode } from "../helpers/codeEncoding"
+import CodeEditor from "./CodeEditor"
 
 function Workflow() {
     const { topic } = useParams()
@@ -52,10 +54,11 @@ function Workflow() {
     // const [deleteLoading, setDeleteLoading] = useState(false)
     // const [publishLoading, setPublishLoading] = useState(false)
 
-    const { workflow, workflowLoading, workflowError, workflowRefetch } =
+    const { workflow, workflowLoading, workflowError, workflowMutate } =
         useData(`/api/workflows/${topic}`, {
             resourceName: "workflow",
-            onSuccess: (item) => setData({ ...item }),
+            onSuccess: (item) =>
+                setData({ ...item, code: codeDecode(item.code) }),
         })
 
     // useEffect(() => {}, [third])
@@ -67,7 +70,7 @@ function Workflow() {
         setSaveLoading(true)
         const body = {
             topic: data.topic,
-            code: data.code,
+            code: codeEncode(data.code),
         }
         const { responseData, error } = await fetch(
             `/api/workflows/${topic}`,
@@ -76,7 +79,8 @@ function Workflow() {
         )
         setSaveLoading(false)
         if (error) return setFormError(error)
-        setData({ ...responseData })
+        workflowMutate({ ...responseData })
+        setData({ ...responseData, code: codeDecode(responseData.code) })
     }
 
     async function deleteWorkflow() {
@@ -91,7 +95,7 @@ function Workflow() {
 
     const togglePublishWorkflow = async () => {
         setLoadingStates({ ...loadingStates, publish: true })
-        const { error } = await fetch(
+        const { responseData, error } = await fetch(
             `/api/workflows/${workflow.topic}/${
                 workflow.published ? "unpublish" : "publish"
             }`,
@@ -100,7 +104,8 @@ function Workflow() {
         setLoadingStates({ ...loadingStates, publish: false })
         if (error) return setToast(error, true)
         setToast(workflow.published ? "Unpublished" : "Published")
-        workflowRefetch()
+        workflowMutate({ ...responseData })
+        setData({ ...responseData, code: codeDecode(responseData.code) })
     }
 
     if (workflowLoading) {
@@ -192,7 +197,9 @@ function Workflow() {
                                                     })
                                                 }
                                                 value={data.code}
-                                                presets={{ topic: data.topic }}
+                                                presets={{
+                                                    topic: data.topic,
+                                                }}
                                             />
                                         )}
 

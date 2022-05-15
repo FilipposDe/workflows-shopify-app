@@ -1,14 +1,15 @@
-const LIB_SOURCES = [
+const FROM_APP = [
     `
 declare class Constants {\
     static get(key:string):string\
     static remove(key:string):string\
 }\
 `,
-    `\
-declare const RestClient:any\
-`,
 ]
+
+const LIB_SOURCES = {
+    FROM_APP,
+}
 
 export default LIB_SOURCES
 

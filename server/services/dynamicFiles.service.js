@@ -25,11 +25,16 @@ const lintConfig = {
 }
 
 async function dynamicallyImportFile(fileName) {
-    const filePath = getDynamicFilePath(fileName)
-    const fileUrl = pathToFileURL(filePath).toString()
-    const { default: importedFn } = await import(fileUrl)
-    DYNAMIC_IMPORTS[fileName] = importedFn
-    return importedFn
+    try {
+        const filePath = getDynamicFilePath(fileName)
+        const fileUrl = pathToFileURL(filePath).toString()
+        const { default: importedFn } = await import(fileUrl)
+        DYNAMIC_IMPORTS[fileName] = importedFn
+        return importedFn
+    } catch (error) {
+        logger.error(error)
+        return null
+    }
 }
 
 function getDynamicFilePath(fileName) {
@@ -43,13 +48,14 @@ function deleteImport(key) {
 
 function writeDynamicFile(fileName, text) {
     const filePath = getDynamicFilePath(fileName)
-    const fileContent = `export default async function ${
-        fileName.split(".")[0]
-        // TODO continue work
-    }(data) {
-        ${text}
-    }`
-    fs.writeFileSync(filePath, fileContent)
+    // const fileContent = `export default async function ${
+    //     fileName.split(".")[0]
+    //     // TODO continue work
+    // }(data) {
+    //     ${text}
+    // }`
+    // fs.writeFileSync(filePath, fileContent)
+    fs.writeFileSync(filePath, text)
 }
 
 function deleteDynamicFile(fileName) {
@@ -69,22 +75,23 @@ function dynamicFileExists(fileName) {
 }
 
 function lintDynamicFile(fileName) {
-    const filePath = getDynamicFilePath(fileName)
-    const file = fs.readFileSync(filePath, { encoding: "utf8" })
-    const text = file.toString()
-    const functionName = fileName.split(".")[0]
-    const textStart = `export default async function ${functionName}(data) {`
-    const textEnd = `}`
-    const trimmed = text.trim()
-    if (!trimmed.startsWith(textStart) || !trimmed.endsWith(textEnd)) {
-        return false
-    }
-    const { Linter } = eslint
-    const linter = new Linter()
-    const lintMessages = linter.verify(trimmed, lintConfig)
-    if (lintMessages.some((message) => message.fatal)) {
-        return false
-    }
+    // TODO
+    // const filePath = getDynamicFilePath(fileName)
+    // const file = fs.readFileSync(filePath, { encoding: "utf8" })
+    // const text = file.toString()
+    // const functionName = fileName.split(".")[0]
+    // const textStart = `export default async function ${functionName}(data) {`
+    // const textEnd = `}`
+    // const trimmed = text.trim()
+    // if (!trimmed.startsWith(textStart) || !trimmed.endsWith(textEnd)) {
+    //     return false
+    // }
+    // const { Linter } = eslint
+    // const linter = new Linter()
+    // const lintMessages = linter.verify(trimmed, lintConfig)
+    // if (lintMessages.some((message) => message.fatal)) {
+    //     return false
+    // }
     return true
 }
 
@@ -94,15 +101,6 @@ function addFile(fileName, code) {
         throw new ApiError(400, "Found linting errors") // TODO
     }
 }
-
-// async function publishFile(fileName, code) {
-//     writeDynamicFile(fileName, code)
-//     if (!lintDynamicFile(fileName)) {
-//         return false
-//     }
-//     await dynamicallyImportFile(fileName)
-//     return true
-// }
 
 function getImport(topic) {
     const fileName = Workflows.getFileNameFromTopic(topic)
@@ -138,16 +136,6 @@ async function initServerFiles() {
     }
 }
 
-async function getAllFiles() {
-    const dirPath = path.join(__dirname, "..", "..", "storage")
-    const fileNames = []
-    const dirFiles = fs.readdirSync(dirPath)
-    for (const file of dirFiles) {
-        fileNames.push(file)
-    }
-    return fileNames
-}
-
 const lintDynamicFileAsync = (fileName) =>
     new Promise((resolve) => {
         const isValid = lintDynamicFile(fileName)
@@ -159,12 +147,13 @@ const getFunctionContents = (fileName) =>
         const filePath = getDynamicFilePath(fileName)
         const text = fs.readFileSync(filePath, { encoding: "utf8" })
         const trimmed = text.toString().trim()
-        let result = ""
-        result = trimmed.replace(
-            /^\s*export default async function [a-zA-Z]*\(data\) {\s*/,
-            ""
-        )
-        result = result.replace(/}\s*$/, "")
+        let result = trimmed
+        // let result = ""
+        // result = trimmed.replace(
+        //     /^\s*export default async function [a-zA-Z]*\(data\) {\s*/,
+        //     ""
+        // )
+        // result = result.replace(/}\s*$/, "")
         resolve(result)
     })
 

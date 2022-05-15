@@ -17,6 +17,7 @@ async function cleanupTopicHandler(topic) {
     const allTopicWebhooksQuery = listTopicWebhooksQuery(topic)
     const result = await clientG.query({ data: allTopicWebhooksQuery })
     if (!result?.body?.data?.webhookSubscriptions?.edges?.length) {
+        console.log(result?.body)
         // TODO it's okay if there's none, not okay if there are errors
         throw new ApiError(404, "Could not find this webhook on Shopify")
     }
@@ -54,6 +55,9 @@ async function createTopicHandler(topic, code) {
     files.addFile(fileName, code)
     // 2. Get handler (function object) by importing file
     const handlerFn = await files.dynamicallyImportFile(fileName)
+    if (handlerFn === null) {
+        throw new ApiError(500, `Failed to dynamically import file`)
+    }
     // 3. Add handler to registry
     Shopify.Webhooks.Registry.addHandler(topic, {
         path: "/webhooks",
@@ -73,28 +77,32 @@ async function createTopicHandler(topic, code) {
     }
 }
 
+async function getStatus(workflow) {
+    const status = {}
+    const fileName = Workflows.getFileNameFromTopic(workflow.topic)
+    if (!files.dynamicFileExists(fileName)) return {}
+    status.fileIsValid = await files.lintDynamicFileAsync(fileName)
+    const fileContent = await files.getFunctionContents(fileName)
+    status.fileIsPublished = fileContent.trim() === workflow.code.trim()
+    return status
+}
+
 const getWorkflows = catchAsync(async (req, res) => {
     const workflows = await Workflows.list()
+    const result = []
     for (const workflow of workflows) {
-        const fileName = Workflows.getFileNameFromTopic(workflow.topic)
-        if (!files.dynamicFileExists(fileName)) continue
-        workflow.fileIsValid = await files.lintDynamicFileAsync(fileName)
-        const fileContent = await files.getFunctionContents(fileName)
-        workflow.fileIsPublished = fileContent.trim() === workflow.code.trim()
+        const status = await getStatus(workflow)
+        result.push({ ...workflow, ...status })
     }
-    res.status(200).send(workflows)
+    res.status(200).send(result)
 })
 
 const getWorkflow = catchAsync(async (req, res) => {
     const { topic } = req.params
     const workflow = await Workflows.findByTopic(topic)
-    const fileName = Workflows.getFileNameFromTopic(workflow.topic)
-    if (files.dynamicFileExists(fileName)) {
-        workflow.fileIsValid = await files.lintDynamicFileAsync(fileName)
-        const fileContent = await files.getFunctionContents(fileName)
-        workflow.fileIsPublished = fileContent.trim() === workflow.code.trim()
-    }
-    res.status(200).send(workflow)
+    const status = await getStatus(workflow)
+    const result = { ...workflow, ...status }
+    res.status(200).send(result)
 })
 
 const createWorkflow = catchAsync(async (req, res) => {
@@ -103,22 +111,32 @@ const createWorkflow = catchAsync(async (req, res) => {
 })
 
 const updateWorkflow = catchAsync(async (req, res) => {
-    const data = await Workflows.update(req.params.topic, req.body)
-    res.status(200).send(data)
+    const workflow = await Workflows.update(req.params.topic, req.body)
+    const status = await getStatus(workflow)
+    const result = { ...workflow, ...status }
+    res.status(200).send(result)
 })
 
 const publishWorkflow = catchAsync(async (req, res) => {
     const workflow = await Workflows.findByTopic(req.params.topic)
-    await Workflows.update(workflow.topic, { published: true })
     await createTopicHandler(workflow.topic, workflow.code)
-    res.status(200).send({ result: "success" })
+    const updatedWorkflow = await Workflows.update(workflow.topic, {
+        published: true,
+    })
+    const status = await getStatus(updatedWorkflow)
+    const result = { ...updatedWorkflow, ...status }
+    res.status(200).send(result)
 })
 
 const unpublishWorkflow = catchAsync(async (req, res) => {
     const workflow = await Workflows.findByTopic(req.params.topic)
     await cleanupTopicHandler(req.params.topic)
-    await Workflows.update(workflow.topic, { published: false })
-    res.status(200).send({ result: "success" })
+    const updatedWorkflow = await Workflows.update(workflow.topic, {
+        published: false,
+    })
+    const status = await getStatus(updatedWorkflow)
+    const result = { ...updatedWorkflow, ...status }
+    res.status(200).send(result)
 })
 
 const deleteWorkflow = catchAsync(async (req, res) => {

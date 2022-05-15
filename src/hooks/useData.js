@@ -26,11 +26,16 @@ export function useData(
         getData()
     }, [])
 
+    function mutate(newData) {
+        setData(newData)
+    }
+
     return {
         [resourceName]: data,
         [`${resourceName}Loading`]: loading,
         [`${resourceName}Error`]: error,
         [`${resourceName}Refetch`]: getData,
+        [`${resourceName}Mutate`]: mutate,
     }
 }
 

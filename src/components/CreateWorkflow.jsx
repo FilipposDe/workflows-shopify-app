@@ -13,11 +13,12 @@ import {
     Spinner,
 } from "@shopify/polaris"
 import useData from "../hooks/useData"
-import { useState } from "react"
+import React, { Suspense, useState } from "react"
 import useFetch from "../hooks/useFetch"
 import useNav from "../hooks/useNav"
-import CodeEditor from "./CodeEditor"
+// import CodeEditor from "./CodeEditor"
 import { WEBHOOK_TOPICS } from "../../common/topic-list"
+import CodeEditor from "./CodeEditor"
 
 export default function CreateWorkflow() {
     const [data, setData] = useState({ topic: "", code: "" })
@@ -109,7 +110,10 @@ export default function CreateWorkflow() {
                                     {!!data.topic && (
                                         <CodeEditor
                                             onChange={(v) =>
-                                                setData({ ...data, code: v })
+                                                setData({
+                                                    ...data,
+                                                    code: v,
+                                                })
                                             }
                                             value={data.code}
                                             presets={{ topic: data.topic }}
