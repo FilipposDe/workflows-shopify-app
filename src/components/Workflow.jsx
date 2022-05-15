@@ -33,6 +33,7 @@ import WorkflowStatus from "./WorkflowStatus"
 import useToast from "../hooks/useToast"
 import { codeDecode, codeEncode } from "../helpers/codeEncoding"
 import CodeEditor from "./CodeEditor"
+import getDefaultCode from "../helpers/defaultCode"
 
 function Workflow() {
     const { topic } = useParams()
@@ -106,6 +107,12 @@ function Workflow() {
         setToast(workflow.published ? "Unpublished" : "Published")
         workflowMutate({ ...responseData })
         setData({ ...responseData, code: codeDecode(responseData.code) })
+    }
+
+    function onReset(e) {
+        e.preventDefault()
+        if (!data.topic) return
+        setData({ ...data, code: getDefaultCode(data.topic) })
     }
 
     if (workflowLoading) {
@@ -220,6 +227,13 @@ function Workflow() {
                                                 onClick={saveWorkflow}
                                             >
                                                 Save
+                                            </Button>
+                                            <Button
+                                                onClick={onReset}
+                                                outline
+                                                disabled={!data.topic}
+                                            >
+                                                Reset
                                             </Button>
                                             {/* <Button
                                                 outline

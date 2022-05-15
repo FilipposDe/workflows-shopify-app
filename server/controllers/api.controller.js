@@ -81,19 +81,25 @@ async function getStatus(workflow) {
     const status = {}
     const fileName = Workflows.getFileNameFromTopic(workflow.topic)
     if (!files.dynamicFileExists(fileName)) return {}
-    status.fileIsValid = await files.lintDynamicFileAsync(fileName)
+    try {
+        status.fileIsValid = await files.lintDynamicFileAsync(fileName)
+    } catch (error) {
+        //
+    }
     const fileContent = await files.getFunctionContents(fileName)
     status.fileIsPublished = fileContent.trim() === workflow.code.trim()
     return status
 }
 
 const getWorkflows = catchAsync(async (req, res) => {
+    console.log("GET")
     const workflows = await Workflows.list()
     const result = []
     for (const workflow of workflows) {
         const status = await getStatus(workflow)
         result.push({ ...workflow, ...status })
     }
+    console.log("DONE")
     res.status(200).send(result)
 })
 

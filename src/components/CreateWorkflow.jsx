@@ -13,12 +13,13 @@ import {
     Spinner,
 } from "@shopify/polaris"
 import useData from "../hooks/useData"
-import React, { Suspense, useState } from "react"
+import React, { Suspense, useEffect, useState } from "react"
 import useFetch from "../hooks/useFetch"
 import useNav from "../hooks/useNav"
 // import CodeEditor from "./CodeEditor"
 import { WEBHOOK_TOPICS } from "../../common/topic-list"
 import CodeEditor from "./CodeEditor"
+import getDefaultCode from "../helpers/defaultCode"
 
 export default function CreateWorkflow() {
     const [data, setData] = useState({ topic: "", code: "" })
@@ -27,12 +28,20 @@ export default function CreateWorkflow() {
     const nav = useNav()
 
     const { workflows, workflowsLoading, workflowsError } = useData(
-        `/api/workflows/`,
-        "workflows",
-        []
+        `/api/workflows`,
+        {
+            resourceName: "workflows",
+            defaultValue: [],
+        }
     )
 
     const fetch = useFetch()
+
+    useEffect(() => {
+        if (data.topic && !data.code) {
+            setData({ ...data, code: getDefaultCode(data.topic) })
+        }
+    }, [data.topic])
 
     const saveWorkflow = async () => {
         setFormError("")
@@ -46,6 +55,12 @@ export default function CreateWorkflow() {
         setSaveLoading(false)
         if (error) return setFormError(error)
         nav("/")
+    }
+
+    function onReset(e) {
+        e.preventDefault()
+        if (!data.topic) return
+        setData({ ...data, code: getDefaultCode(data.topic) })
     }
 
     const usedTopics = workflows?.map((item) => item.topic) || []
@@ -94,44 +109,59 @@ export default function CreateWorkflow() {
                                 </Stack>
                             )}
 
-                            <Form onSubmit={() => saveWorkflow()}>
-                                <FormLayout>
-                                    <FormLayout.Group condensed>
-                                        <Select
-                                            label="Topic"
-                                            options={["", ...availableTopics]}
-                                            onChange={(v) =>
-                                                setData({ ...data, topic: v })
-                                            }
-                                            value={data.topic}
-                                        />
-                                    </FormLayout.Group>
+                            {!workflowsLoading && (
+                                <Form onSubmit={() => saveWorkflow()}>
+                                    <FormLayout>
+                                        <FormLayout.Group condensed>
+                                            <Select
+                                                label="Topic"
+                                                options={[
+                                                    "",
+                                                    ...availableTopics,
+                                                ]}
+                                                onChange={(v) =>
+                                                    setData({
+                                                        ...data,
+                                                        topic: v,
+                                                    })
+                                                }
+                                                value={data.topic}
+                                            />
+                                        </FormLayout.Group>
 
-                                    {!!data.topic && (
-                                        <CodeEditor
-                                            onChange={(v) =>
-                                                setData({
-                                                    ...data,
-                                                    code: v,
-                                                })
-                                            }
-                                            value={data.code}
-                                            presets={{ topic: data.topic }}
-                                        />
-                                    )}
+                                        {!!data.topic && (
+                                            <CodeEditor
+                                                onChange={(v) =>
+                                                    setData({
+                                                        ...data,
+                                                        code: v,
+                                                    })
+                                                }
+                                                value={data.code}
+                                                presets={{ topic: data.topic }}
+                                            />
+                                        )}
 
-                                    <ButtonGroup>
-                                        <Button
-                                            submit
-                                            primary
-                                            loading={saveLoading}
-                                            disabled={!data.topic}
-                                        >
-                                            Save
-                                        </Button>
-                                    </ButtonGroup>
-                                </FormLayout>
-                            </Form>
+                                        <ButtonGroup>
+                                            <Button
+                                                submit
+                                                primary
+                                                loading={saveLoading}
+                                                disabled={!data.topic}
+                                            >
+                                                Save
+                                            </Button>
+                                            <Button
+                                                onClick={onReset}
+                                                outline
+                                                disabled={!data.topic}
+                                            >
+                                                Reset
+                                            </Button>
+                                        </ButtonGroup>
+                                    </FormLayout>
+                                </Form>
+                            )}
                         </Card>
                     </Layout.Section>
                 </Layout>

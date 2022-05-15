@@ -17,14 +17,14 @@ async function addAutoTypes(editor, monaco) {
         // sourceCache: new LocalStorageCache(), // Cache loaded sources in localStorage. May be omitted
         // Other options...
         // Log progress updates to a div console
-        onUpdate: (u, t) => {
-            console.log(t)
-        },
+        // onUpdate: (u, t) => {
+        //     console.log(t)
+        // },
 
-        // Log errors to a div console
-        onError: (e) => {
-            console.log(e)
-        },
+        // // Log errors to a div console
+        // onError: (e) => {
+        //     console.log(e)
+        // },
     })
     // compiler options
     // monaco.languages.typescript.javascriptDefaults.setCompilerOptions({

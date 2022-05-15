@@ -8,6 +8,8 @@ import ApiError from "../helpers/ApiError.js"
 import logger from "../logger.js"
 const { Workflows } = dbService
 
+// TODO more error handling
+
 const DYNAMIC_IMPORTS = {}
 
 const __filename = fileURLToPath(import.meta.url)
@@ -75,30 +77,37 @@ function dynamicFileExists(fileName) {
 }
 
 function lintDynamicFile(fileName) {
-    // TODO
-    // const filePath = getDynamicFilePath(fileName)
-    // const file = fs.readFileSync(filePath, { encoding: "utf8" })
-    // const text = file.toString()
+    const filePath = getDynamicFilePath(fileName)
+    const file = fs.readFileSync(filePath, { encoding: "utf8" })
+    const text = file.toString().trim()
+
+    const hasOneDefaultExport =
+        text.match(/^export default\s*(async?)*\sfunction/gm)?.length === 1
+    if (!hasOneDefaultExport) {
+        throw new Error("Did not find a single default export")
+    }
+
+    const { Linter } = eslint
+    const linter = new Linter()
+    const lintMessages = linter.verify(text, lintConfig)
+    if (lintMessages.some((message) => message.fatal)) {
+        throw new Error("Linting error")
+    }
+
     // const functionName = fileName.split(".")[0]
     // const textStart = `export default async function ${functionName}(data) {`
     // const textEnd = `}`
-    // const trimmed = text.trim()
     // if (!trimmed.startsWith(textStart) || !trimmed.endsWith(textEnd)) {
     //     return false
     // }
-    // const { Linter } = eslint
-    // const linter = new Linter()
-    // const lintMessages = linter.verify(trimmed, lintConfig)
-    // if (lintMessages.some((message) => message.fatal)) {
-    //     return false
-    // }
-    return true
 }
 
 function addFile(fileName, code) {
     writeDynamicFile(fileName, code)
-    if (!lintDynamicFile(fileName)) {
-        throw new ApiError(400, "Found linting errors") // TODO
+    try {
+        lintDynamicFile(fileName)
+    } catch (error) {
+        throw new ApiError(400, "Found file validation") // TODO
     }
 }
 
@@ -119,11 +128,11 @@ async function initServerFiles() {
             if (!dynamicFileExists(fileName)) {
                 writeDynamicFile(fileName, code)
             }
-            if (!lintDynamicFile(fileName)) {
-                // TODO
+            try {
+                lintDynamicFile(fileName)
+            } catch (error) {
+                logger.error(error)
                 throw new Error(`Found invalid code in ${fileName}, exiting.`)
-                // invalidWorkflows.push(workflow)
-                // continue
             }
             validTopics.push(topic)
             await dynamicallyImportFile(fileName)
@@ -137,9 +146,13 @@ async function initServerFiles() {
 }
 
 const lintDynamicFileAsync = (fileName) =>
-    new Promise((resolve) => {
-        const isValid = lintDynamicFile(fileName)
-        resolve(isValid)
+    new Promise((resolve, reject) => {
+        try {
+            const isValid = lintDynamicFile(fileName)
+            resolve(isValid)
+        } catch (error) {
+            reject(error)
+        }
     })
 
 const getFunctionContents = (fileName) =>
