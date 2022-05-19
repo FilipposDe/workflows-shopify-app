@@ -17,4 +17,8 @@ apiRoutes.post("/workflows/:topic/unpublish", apiController.unpublishWorkflow)
 
 apiRoutes.delete("/workflows/:topic", apiController.deleteWorkflow)
 
+apiRoutes.get("/constants", apiController.getConstants)
+
+apiRoutes.post("/constants", apiController.updateConstants)
+
 export default apiRoutes

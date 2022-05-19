@@ -13,7 +13,7 @@ import WorkflowStatus from "./WorkflowStatus"
 import useToast from "../hooks/useToast"
 import { useState } from "react"
 
-export function WorkflowsList() {
+export default function WorkflowsList() {
     const nav = useNav()
     const fetch = useFetch()
 

@@ -158,11 +158,12 @@ const Settings = {
         if (!settingsData) {
             return await createDoc({ [key]: value }, "settings")
         }
-        return await updateDocById(
+        const newSettings = await updateDocById(
             settingsData.id,
             { ...settingsData, [key]: value },
             "settings"
         )
+        return newSettings[key]
     },
     async get(key) {
         const settingsData = await findFirstDoc("settings")

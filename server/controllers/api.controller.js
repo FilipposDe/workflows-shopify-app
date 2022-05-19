@@ -6,8 +6,9 @@ import shopifyService from "../services/shopify.service.js"
 import files from "../services/dynamicFiles.service.js"
 import { listTopicWebhooksQuery } from "../helpers/queries.js"
 import logger from "../logger.js"
+import dynamicFilesService from "../services/dynamicFiles.service.js"
 const { Shopify } = shopifyService
-const { Workflows } = dbService
+const { Workflows, Settings } = dbService
 // TODO continue work
 
 async function cleanupTopicHandler(topic) {
@@ -92,14 +93,12 @@ async function getStatus(workflow) {
 }
 
 const getWorkflows = catchAsync(async (req, res) => {
-    console.log("GET")
     const workflows = await Workflows.list()
     const result = []
     for (const workflow of workflows) {
         const status = await getStatus(workflow)
         result.push({ ...workflow, ...status })
     }
-    console.log("DONE")
     res.status(200).send(result)
 })
 
@@ -154,6 +153,20 @@ const deleteWorkflow = catchAsync(async (req, res) => {
     res.status(200).send({ result: "success" })
 })
 
+const getConstants = catchAsync(async (req, res) => {
+    const constantsStr = await Settings.get("constants")
+    const constants = JSON.parse(constantsStr) || []
+    res.status(200).send({ constants })
+})
+
+const updateConstants = catchAsync(async (req, res) => {
+    const constantsStr = JSON.stringify(req.body.constants)
+    const constantsNewStr = await Settings.put("constants", constantsStr)
+    const constants = JSON.parse(constantsNewStr) || []
+    await dynamicFilesService.setConstants()
+    res.status(200).send({ constants })
+})
+
 const apiController = {
     getWorkflows,
     createWorkflow,
@@ -162,6 +175,8 @@ const apiController = {
     unpublishWorkflow,
     deleteWorkflow,
     getWorkflow,
+    getConstants,
+    updateConstants,
 }
 
 export default apiController

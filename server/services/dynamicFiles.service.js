@@ -6,11 +6,12 @@ import dbService from "./db.service.js"
 import { capUnderscoreToCamelCase } from "../../util/topics.js"
 import ApiError from "../helpers/ApiError.js"
 import logger from "../logger.js"
-const { Workflows } = dbService
+const { Workflows, Settings } = dbService
 
 // TODO more error handling
 
 const DYNAMIC_IMPORTS = {}
+const CONSTANTS = {}
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -29,7 +30,8 @@ const lintConfig = {
 async function dynamicallyImportFile(fileName) {
     try {
         const filePath = getDynamicFilePath(fileName)
-        const fileUrl = pathToFileURL(filePath).toString()
+        const fileUrl =
+            pathToFileURL(filePath).toString() + `?update=${Date.now()}`
         const { default: importedFn } = await import(fileUrl)
         DYNAMIC_IMPORTS[fileName] = importedFn
         return importedFn
@@ -116,6 +118,22 @@ function getImport(topic) {
     return DYNAMIC_IMPORTS[fileName]
 }
 
+async function setConstants() {
+    const constantsStr = await Settings.get("constants")
+    const constants = JSON.parse(constantsStr) || []
+    for (const { name, value } of constants) {
+        CONSTANTS[name] = value
+    }
+}
+
+function getConstants() {
+    return CONSTANTS
+}
+
+function getConstant(key) {
+    return CONSTANTS[key]
+}
+
 async function initServerFiles() {
     try {
         const allWorkflows = await Workflows.list()
@@ -180,6 +198,9 @@ const dynamicFilesService = {
     initServerFiles,
     getImport,
     dynamicFileExists,
+    getConstants,
+    setConstants,
+    getConstant,
 }
 
 export default dynamicFilesService
