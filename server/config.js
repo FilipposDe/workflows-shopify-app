@@ -1,7 +1,11 @@
 import "dotenv/config"
 import { ApiVersion } from "@shopify/shopify-api"
 
-const optionalEnvVars = ["PORT", "VITE_TEST_BUILD"]
+const optionalEnvVars = [
+    "PORT",
+    "VITE_TEST_BUILD",
+    "GOOGLE_APPLICATION_CREDENTIALS",
+]
 
 const requiredEnvVars = [
     "NODE_ENV",
@@ -16,7 +20,6 @@ const requiredEnvVars = [
     "FIREBASE_PROJECT_ID",
     "GOOGLE_SERVICE_ACCOUNT_EMAIL",
     "GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY",
-    "GOOGLE_APPLICATION_CREDENTIALS",
 ]
 
 const configVars = {
