@@ -83,7 +83,8 @@ async function getStatus(workflow) {
     const fileName = Workflows.getFileNameFromTopic(workflow.topic)
     if (!files.dynamicFileExists(fileName)) return {}
     try {
-        status.fileIsValid = await files.lintDynamicFileAsync(fileName)
+        await files.lintDynamicFileAsync(fileName)
+        status.fileIsValid = true
     } catch (error) {
         //
     }

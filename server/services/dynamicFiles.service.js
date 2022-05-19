@@ -93,6 +93,7 @@ function lintDynamicFile(fileName) {
     const linter = new Linter()
     const lintMessages = linter.verify(text, lintConfig)
     if (lintMessages.some((message) => message.fatal)) {
+        logger.error({ lintMessages })
         throw new Error("Linting error")
     }
 
@@ -166,8 +167,8 @@ async function initServerFiles() {
 const lintDynamicFileAsync = (fileName) =>
     new Promise((resolve, reject) => {
         try {
-            const isValid = lintDynamicFile(fileName)
-            resolve(isValid)
+            lintDynamicFile(fileName)
+            resolve()
         } catch (error) {
             reject(error)
         }
