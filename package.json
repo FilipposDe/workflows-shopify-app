@@ -42,7 +42,7 @@
         "winston": "^3.7.2"
     },
     "devDependencies": {
-        "eslint": "^8.14.0",
+        "eslint": "^8.15.0",
         "eslint-plugin-react": "^7.29.4",
         "husky": "^7.0.4",
         "nodemon": "^2.0.15",
