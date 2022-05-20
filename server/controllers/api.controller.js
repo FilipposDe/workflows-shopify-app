@@ -8,6 +8,7 @@ import { listTopicWebhooksQuery } from "../helpers/queries.js"
 import { encrypt, decrypt } from "../helpers/crypt.js"
 import logger from "../logger.js"
 import dynamicFilesService from "../services/dynamicFiles.service.js"
+import { WEBHOOK_TOPICS } from "../helpers/topics.js"
 const { Shopify } = shopifyService
 const { Workflows, Settings } = dbService
 
@@ -188,6 +189,13 @@ const updateConstants = catchAsync(async (req, res) => {
     res.status(200).send({ constants: newConstants })
 })
 
+const getTopics = catchAsync(async (req, res) => {
+    const result = WEBHOOK_TOPICS.filter((item) =>
+        item.scopes.split(",").some((scope) => config.SCOPES.includes(scope))
+    )
+    res.status(200).send(result)
+})
+
 const apiController = {
     getWorkflows,
     createWorkflow,
@@ -198,6 +206,7 @@ const apiController = {
     getWorkflow,
     getConstants,
     updateConstants,
+    getTopics,
 }
 
 export default apiController

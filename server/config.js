@@ -1,6 +1,8 @@
 import "dotenv/config"
 import { ApiVersion } from "@shopify/shopify-api"
 
+const SCOPES = "write_products,write_customers,write_draft_orders"
+
 const optionalEnvVars = [
     "PORT",
     "VITE_TEST_BUILD",
@@ -12,7 +14,6 @@ const requiredEnvVars = [
     "SHOPIFY_API_KEY",
     "SHOPIFY_API_SECRET",
     "SHOP",
-    "SCOPES",
     "HOST",
     "SERVER_SECRET",
     "FIREBASE_DB_URL",
@@ -47,6 +48,7 @@ function generateConfigObj() {
         config[key] = process.env[key]
     }
     Object.assign(config, configVars)
+    config.SCOPES = SCOPES
     config.PORT = parseInt(config.PORT || "8081", 10)
     config.isTest = config.NODE_ENV === "test" || !!config.VITE_TEST_BUILD
     config.isProd = config.NODE_ENV === "production"

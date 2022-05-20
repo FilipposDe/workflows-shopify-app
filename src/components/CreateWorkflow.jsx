@@ -17,7 +17,6 @@ import React, { Suspense, useEffect, useState } from "react"
 import useFetch from "../hooks/useFetch"
 import useNav from "../hooks/useNav"
 // import CodeEditor from "./CodeEditor"
-import { WEBHOOK_TOPICS } from "../../common/topic-list"
 import CodeEditor from "./CodeEditor"
 import getDefaultCode from "../helpers/defaultCode"
 
@@ -34,6 +33,11 @@ export default function CreateWorkflow() {
             defaultValue: [],
         }
     )
+
+    const { topics, topicsLoading, topicsError } = useData(`/api/topics`, {
+        resourceName: "topics",
+        defaultValue: [],
+    })
 
     const fetch = useFetch()
 
@@ -64,11 +68,11 @@ export default function CreateWorkflow() {
     }
 
     const usedTopics = workflows?.map((item) => item.topic) || []
-    const availableTopics = WEBHOOK_TOPICS.filter(
-        (item) => !usedTopics.includes(item)
+    const availableTopics = topics.filter(
+        (item) => !usedTopics.includes(item.name)
     )
 
-    const error = workflowsError || formError
+    const error = workflowsError || formError || topicsError
 
     return (
         <Frame>
@@ -100,16 +104,17 @@ export default function CreateWorkflow() {
                                 </>
                             )}
 
-                            {workflowsLoading && (
-                                <Stack distribution="center">
-                                    <Spinner
-                                        accessibilityLabel="Workflows loading..."
-                                        size="large"
-                                    />
-                                </Stack>
-                            )}
+                            {workflowsLoading ||
+                                (topicsLoading && (
+                                    <Stack distribution="center">
+                                        <Spinner
+                                            accessibilityLabel="Workflows loading..."
+                                            size="large"
+                                        />
+                                    </Stack>
+                                ))}
 
-                            {!workflowsLoading && (
+                            {!workflowsLoading && !topicsLoading && (
                                 <Form onSubmit={() => saveWorkflow()}>
                                     <FormLayout>
                                         <FormLayout.Group condensed>
@@ -117,7 +122,9 @@ export default function CreateWorkflow() {
                                                 label="Topic"
                                                 options={[
                                                     "",
-                                                    ...availableTopics,
+                                                    ...availableTopics.map(
+                                                        (item) => item.name
+                                                    ),
                                                 ]}
                                                 onChange={(v) =>
                                                     setData({

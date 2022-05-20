@@ -21,4 +21,6 @@ apiRoutes.get("/constants", apiController.getConstants)
 
 apiRoutes.post("/constants", apiController.updateConstants)
 
+apiRoutes.get("/topics", apiController.getTopics)
+
 export default apiRoutes
