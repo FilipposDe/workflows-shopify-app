@@ -6,7 +6,6 @@ import logger from "../logger.js"
 import dbService from "./db.service.js"
 const { Settings, Session } = dbService
 // import { getImport, dynamicFileExists } from "./dynamicFiles.service.js"
-
 async function handleStoreUninstall() {
     try {
         await Settings.put("isInstalled", false)
@@ -36,6 +35,10 @@ function initContext() {
         logger.error("Error during Shopify Context init, exiting.", error)
         process.exit(1)
     }
+}
+
+function getHandler(topic) {
+    return Shopify.Webhooks.Registry.getHandler(topic)
 }
 
 function addExistingHandlers(topics, getHandler) {
@@ -140,6 +143,7 @@ const shopifyService = {
     Shopify,
     addExistingHandlers,
     reRegisterExistingWebhooks,
+    getHandler,
     // addAvailableTopicHandlers,
 }
 

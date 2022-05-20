@@ -2,7 +2,7 @@
 import { Spinner, Stack } from "@shopify/polaris"
 import { capUnderscoreToCamelCase } from "../../util/topics"
 import LIB_SOURCES from "../helpers/editorTypes"
-import { AutoTypings, LocalStorageCache } from "monaco-editor-auto-typings"
+// import { AutoTypings, LocalStorageCache } from "monaco-editor-auto-typings"
 import React, { Suspense } from "react"
 const Editor = React.lazy(() => import("@monaco-editor/react"))
 
@@ -15,6 +15,7 @@ async function addAutoTypes(editor, monaco) {
     //     "ts:filename/constants.d.ts"
     // )
 
+    const { AutoTypings } = await import("monaco-editor-auto-typings")
     await AutoTypings.create(editor, {
         monaco,
         preloadPackages: true,
@@ -35,16 +36,16 @@ async function addAutoTypes(editor, monaco) {
         // },
     })
     // compiler options
-    monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
-        noResolve: true,
-        // target: monaco.languages.typescript.ScriptTarget.ES2016,
-        // allowNonTsExtensions: true,
-        // moduleResolution:
-        //     monaco.languages.typescript.ModuleResolutionKind.NodeJs,
-        // module: monaco.languages.typescript.ModuleKind.CommonJS,
-        // noEmit: true,
-        // typeRoots: ["node_modules/@types"],
-    })
+    // monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
+    // noResolve: true,
+    // target: monaco.languages.typescript.ScriptTarget.ES2016,
+    // allowNonTsExtensions: true,
+    // moduleResolution:
+    //     monaco.languages.typescript.ModuleResolutionKind.NodeJs,
+    // module: monaco.languages.typescript.ModuleKind.CommonJS,
+    // noEmit: true,
+    // typeRoots: ["node_modules/@types"],
+    // })
     // LIB_SOURCES.FROM_APP.forEach((source, index) => {
     //     const libUri = `ts:filename/${index}.d.ts`
     //     // const libUri = "ts:filename/fil.d.ts"

@@ -6,6 +6,7 @@ import dbService from "./db.service.js"
 import { capUnderscoreToCamelCase } from "../../util/topics.js"
 import ApiError from "../helpers/ApiError.js"
 import logger from "../logger.js"
+import { decrypt } from "../helpers/crypt.js"
 const { Workflows, Settings } = dbService
 
 // TODO more error handling
@@ -122,8 +123,8 @@ function getImport(topic) {
 async function setConstants() {
     const constantsStr = await Settings.get("constants")
     const constants = JSON.parse(constantsStr) || []
-    for (const { name, value } of constants) {
-        CONSTANTS[name] = value
+    for (const { name, value, encrypt: isEncrypted } of constants) {
+        CONSTANTS[name] = isEncrypted ? decrypt(value) : value
     }
 }
 

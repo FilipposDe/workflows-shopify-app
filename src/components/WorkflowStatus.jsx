@@ -5,11 +5,10 @@ function WorkflowStatus(props) {
     return (
         <Stack>
             {workflow.published ? (
-                workflow.fileIsValid ? (
-                    <Badge status="success">Valid code</Badge>
-                ) : (
-                    <Badge status="critical">Invalid code</Badge>
-                )
+                workflow.lintErrors ? (
+                    // <Badge status="success">Valid code</Badge>
+                    <Badge status="critical">Lint errors</Badge>
+                ) : null
             ) : null}
             {workflow.published ? (
                 <Badge status="success">Published</Badge>
@@ -18,11 +17,10 @@ function WorkflowStatus(props) {
             )}
 
             {workflow.published ? (
-                workflow.fileIsPublished ? (
-                    <Badge status="success">Up to date</Badge>
-                ) : (
+                workflow.outdatedFileInServer ? (
+                    // <Badge status="success">Up to date</Badge>
                     <Badge status="critical">Outdated file</Badge>
-                )
+                ) : null
             ) : null}
         </Stack>
     )

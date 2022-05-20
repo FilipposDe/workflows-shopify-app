@@ -10,6 +10,7 @@ import {
     Form,
     TextField,
     Spinner,
+    Checkbox,
 } from "@shopify/polaris"
 import useNav from "../hooks/useNav"
 import useData from "../hooks/useData"
@@ -52,13 +53,16 @@ export default function ConstantsList() {
     async function onSave(e) {
         e.preventDefault()
         setFormError("")
-        if (data.some((item) => item.name === "")) {
+        const newData = data.filter(
+            (item) => item.name !== "" && item.value !== ""
+        )
+        if (newData.some((item) => item.name === "")) {
             return setFormError("All names must be filled")
         }
 
         setSaveLoading(true)
         const body = {
-            constants: [...data],
+            constants: [...newData],
         }
         const { responseData, error } = await fetch(
             `/api/constants`,
@@ -106,6 +110,13 @@ export default function ConstantsList() {
 
     return (
         <>
+            <style jsx>
+                {`
+                    [id^="value-encrypt"] {
+                        -webkit-text-security: disc;
+                    }
+                `}
+            </style>
             {toastHtml}
             {formError && (
                 <>
@@ -135,6 +146,11 @@ export default function ConstantsList() {
                                         labelHidden
                                         label="Value"
                                         type="text"
+                                        id={
+                                            item.encrypt
+                                                ? `value-encrypt-${item.name}`
+                                                : undefined
+                                        }
                                         value={item.value}
                                         onChange={(v) =>
                                             changeConstant(item, {
@@ -144,6 +160,19 @@ export default function ConstantsList() {
                                         }
                                         // onChange={handleTextFieldChange}
                                         autoComplete="off"
+                                        connectedRight={
+                                            <Checkbox
+                                                // labelHidden={true}
+                                                label="Encrypt"
+                                                checked={item.encrypt}
+                                                onChange={(v) =>
+                                                    changeConstant(item, {
+                                                        ...item,
+                                                        encrypt: v,
+                                                    })
+                                                }
+                                            />
+                                        }
                                     />
                                 }
                             />

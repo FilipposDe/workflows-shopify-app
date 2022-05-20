@@ -5,6 +5,7 @@ import dbService from "../services/db.service.js"
 import shopifyService from "../services/shopify.service.js"
 import files from "../services/dynamicFiles.service.js"
 import { listTopicWebhooksQuery } from "../helpers/queries.js"
+import { encrypt, decrypt } from "../helpers/crypt.js"
 import logger from "../logger.js"
 import dynamicFilesService from "../services/dynamicFiles.service.js"
 const { Shopify } = shopifyService
@@ -84,12 +85,16 @@ async function getStatus(workflow) {
     if (!files.dynamicFileExists(fileName)) return {}
     try {
         await files.lintDynamicFileAsync(fileName)
-        status.fileIsValid = true
     } catch (error) {
-        //
+        status.lintErrors = true
     }
     const fileContent = await files.getFunctionContents(fileName)
-    status.fileIsPublished = fileContent.trim() === workflow.code.trim()
+    if (fileContent.trim() !== workflow.code.trim()) {
+        status.outdatedFileInServer = true
+    }
+    const h = shopifyService.getHandler(workflow.topic)
+    console.log({ h })
+
     return status
 }
 
@@ -118,6 +123,9 @@ const createWorkflow = catchAsync(async (req, res) => {
 
 const updateWorkflow = catchAsync(async (req, res) => {
     const workflow = await Workflows.update(req.params.topic, req.body)
+    if (workflow.published) {
+        await createTopicHandler(workflow.topic, workflow.code)
+    }
     const status = await getStatus(workflow)
     const result = { ...workflow, ...status }
     res.status(200).send(result)
@@ -157,15 +165,28 @@ const deleteWorkflow = catchAsync(async (req, res) => {
 const getConstants = catchAsync(async (req, res) => {
     const constantsStr = await Settings.get("constants")
     const constants = JSON.parse(constantsStr) || []
+    for (const item of constants) {
+        if (!item.encrypt) continue
+        item.value = decrypt(item.value)
+    }
     res.status(200).send({ constants })
 })
 
 const updateConstants = catchAsync(async (req, res) => {
-    const constantsStr = JSON.stringify(req.body.constants)
+    const constantsBody = req.body.constants
+    for (const item of constantsBody) {
+        if (!item.encrypt) continue
+        item.value = encrypt(item.value)
+    }
+    const constantsStr = JSON.stringify(constantsBody)
     const constantsNewStr = await Settings.put("constants", constantsStr)
-    const constants = JSON.parse(constantsNewStr) || []
-    await dynamicFilesService.setConstants()
-    res.status(200).send({ constants })
+    const newConstants = JSON.parse(constantsNewStr) || []
+    await dynamicFilesService.setConstants() // TODO decrypt
+    for (const item of newConstants) {
+        if (!item.encrypt) continue
+        item.value = decrypt(item.value)
+    }
+    res.status(200).send({ constants: newConstants })
 })
 
 const apiController = {
