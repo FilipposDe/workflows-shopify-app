@@ -14,7 +14,10 @@ function initDB() {
         credential = cert({
             projectId: config.FIREBASE_PROJECT_ID,
             clientEmail: config.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-            privateKey: config.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY,
+            privateKey: config.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY.replace(
+                /\\n/g,
+                "\n"
+            ),
         })
     }
 
