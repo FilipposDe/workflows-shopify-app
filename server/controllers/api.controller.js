@@ -10,7 +10,6 @@ import logger from "../logger.js"
 import dynamicFilesService from "../services/dynamicFiles.service.js"
 const { Shopify } = shopifyService
 const { Workflows, Settings } = dbService
-// TODO continue work
 
 async function cleanupTopicHandler(topic) {
     // 1. Delete the webhook from Shopify

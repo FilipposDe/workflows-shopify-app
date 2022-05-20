@@ -2,10 +2,17 @@ import { capUnderscoreToCamelCase } from "../../util/topics"
 
 export default function getDefaultCode(topic) {
     return `import { Shopify } from '%40shopify/shopify-api' // %40: temp. bug fix
-import { getConstant } from '../util/util.js'
+import { getConstant, getShopifyClientArgs } from '../util/util.js'
 
-export default async function ${capUnderscoreToCamelCase(topic)}(data) {
+async function onBodyReceived(body) {
     // Your code here
+    // const client = new Shopify.Clients.Rest(await getShopifyClientArgs())
+}
+
+export default function ${capUnderscoreToCamelCase(
+        topic
+    )}(_topic, _shop, body) {
+    onBodyReceived(body)
 }
 `
 }

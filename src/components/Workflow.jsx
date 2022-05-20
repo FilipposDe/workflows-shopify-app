@@ -82,6 +82,7 @@ function Workflow() {
         if (error) return setFormError(error)
         workflowMutate({ ...responseData })
         setData({ ...responseData, code: codeDecode(responseData.code) })
+        setToast("Saved")
     }
 
     async function deleteWorkflow() {
