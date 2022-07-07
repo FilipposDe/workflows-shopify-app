@@ -18,8 +18,15 @@ logs
 # ngrok tunnel file
 config/tunnel.pid
 
-# webpack build output
+# vite build output
 dist/
 
-/storage/*
-!/storage/.empty
+# Loaded file storage
+web/storage/*
+!web/storage/.empty
+
+# Partners can use npm, yarn or pnpm with the CLI.
+# We ignore lock files so they don't get a package manager mis-match
+# Without this, they may get a warning if using a different package manager to us
+yarn.lock
+package-lock.json

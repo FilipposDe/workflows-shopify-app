@@ -2,6 +2,13 @@
 
 This is a custom, embedded Shopify app that allows you to write code inside its dashboard, for webhooks that are sent by Shopify.
 
+## Architecture
+
+### Differences from Shopify's default app
+
+-   Auth routes are not middleware, they are part of the app's routes.
+-   The app is embedded with both offline and online tokens, and meant for one shop only
+
 ## Requirements
 
 -   If you don’t have one, [create a Shopify partner account](https://partners.shopify.com/signup).
@@ -11,6 +18,10 @@ This is a custom, embedded Shopify app that allows you to write code inside its 
 ## Installation
 
 TODO
+
+        "heroku-postinstall": "npm run build:client",
+
+////
 
 Add the right scopes and enable the right topics in common
 
