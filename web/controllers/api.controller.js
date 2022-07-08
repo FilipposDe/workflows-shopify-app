@@ -1,16 +1,28 @@
-import config from "../config.js"
-import ApiError from "../helpers/ApiError.js"
-import catchAsync from "../helpers/catchAsync.js"
-import dbService from "../services/db.service.js"
+import { encrypt, decrypt } from "../helpers/crypt.js"
+
 import shopifyService from "../services/shopify.service.js"
 import files from "../services/dynamicFiles.service.js"
-import { listTopicWebhooksQuery } from "../helpers/queries.js"
-import { encrypt, decrypt } from "../helpers/crypt.js"
+import dbService from "../services/db.service.js"
+import config from "../config.js"
+import ApiError from "../helpers/ApiError.js"
 import logger from "../logger.js"
+import catchAsync from "../helpers/catchAsync.js"
 import dynamicFilesService from "../services/dynamicFiles.service.js"
-import { WEBHOOK_TOPICS } from "../helpers/topics.js"
+import { WEBHOOK_TOPICS } from "../common/topic-list.js"
 const { Shopify } = shopifyService
 const { Workflows, Settings } = dbService
+
+function listTopicWebhooksQuery(topic) {
+    return `{
+        webhookSubscriptions (first: 250, topics: [${topic}]) {
+            edges {
+                node {
+                    id
+                }
+            }
+        }
+    }`
+}
 
 async function cleanupTopicHandler(topic) {
     // 1. Delete the webhook from Shopify

@@ -1,18 +1,20 @@
 import express from "express"
 import cookieParser from "cookie-parser"
 import { resolve } from "path"
+
+import { errorConverter, errorHandler } from "./middleware/error.js"
+import isShopInstalled from "./middleware/is-shop-installed.js"
+import authRoutes from "./routes/auth.routes.js"
+import graphqlRoutes from "./routes/graphql.routes.js"
+import apiRoutes from "./routes/api.routes.js"
+import webhookRoutes from "./routes/webhook.routes.js"
 import config from "./config.js"
+import cspHeaders from "./middleware/csp-headers.js"
+import logger from "./logger.js"
 import dbService from "./services/db.service.js"
 import shopifyService from "./services/shopify.service.js"
 import verifyRequest from "./middleware/verify-request.js"
-import isShopInstalled from "./middleware/is-shop-installed.js"
-import webhookRoutes from "./routes/webhook.routes.js"
-import graphqlRoutes from "./routes/graphql.routes.js"
-import cspHeaders from "./middleware/csp-headers.js"
-import authRoutes from "./routes/auth.routes.js"
-import apiRoutes from "./routes/api.routes.js"
-import { errorConverter, errorHandler } from "./middleware/error.js"
-import logger from "./logger.js"
+
 const { Settings } = dbService
 const { Shopify } = shopifyService
 const router = express.Router()

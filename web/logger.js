@@ -1,7 +1,9 @@
 import winston from "winston"
-import config from "./config.js"
+
 import Transport from "winston-transport"
-import dbService from "./services/db.service.js"
+import config from "./config"
+import dbService from "./services/db.service"
+
 const { Logs } = dbService
 
 const MAX_FIRESTORE_CAP = 1000

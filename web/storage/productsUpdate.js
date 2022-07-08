@@ -1,5 +1,4 @@
-import { Shopify, DataType } from "@shopify/shopify-api" // %40: temp. bug fix
-import { getConstant } from "../util/util.js"
+import { Shopify } from "@shopify/shopify-api" // %40: temp. bug fix
 import config from "../server/config.js"
 
 async function main(body) {

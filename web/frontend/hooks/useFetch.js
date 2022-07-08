@@ -1,5 +1,4 @@
 import { useAppBridge } from "@shopify/app-bridge-react"
-import { userLoggedInFetch } from "../App"
 
 class HttpError extends Error {
     constructor(message, httpStatus) {
@@ -9,7 +8,7 @@ class HttpError extends Error {
     }
 }
 
-export default function useFetch() {
+function useFetch() {
     const app = useAppBridge()
     const appFetch = userLoggedInFetch(app)
 
@@ -55,3 +54,5 @@ export default function useFetch() {
 
     return fetchAPI
 }
+
+export default useFetch

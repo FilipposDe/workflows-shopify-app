@@ -1,8 +1,7 @@
 import { Card, Page, Layout, Frame } from "@shopify/polaris"
-
-import WorkflowsList from "./WorkflowsList"
 import useNav from "../hooks/useNav"
 import ConstantsList from "./ConstantsList"
+import WorkflowsList from "./WorkflowsList"
 
 export function HomePage() {
     const nav = useNav()
@@ -26,7 +25,6 @@ export function HomePage() {
                     <Layout.Section oneHalf>
                         <Card sectioned title="Constants">
                             <ConstantsList />
-                            {/* <SecretsList /> */}
                         </Card>
                     </Layout.Section>
                 </Layout>

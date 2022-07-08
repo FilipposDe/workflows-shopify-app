@@ -1,33 +1,29 @@
 import {
-	ApolloClient,
-	ApolloProvider,
-	HttpLink,
-	InMemoryCache,
-} from '@apollo/client'
-import {
-	useAppBridge,
-	useClientRouting,
-	useNavigate,
-} from '@shopify/app-bridge-react'
-import { authenticatedFetch } from '@shopify/app-bridge-utils'
-import { Redirect } from '@shopify/app-bridge/actions'
-import { AppProvider as PolarisProvider } from '@shopify/polaris'
-import translations from '@shopify/polaris/locales/en.json'
-import '@shopify/polaris/build/esm/styles.css'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import { HomePage } from './components/HomePage'
-import Workflow from './components/Workflow'
-import CreateWorkflow from './components/CreateWorkflow'
-import ErrorBoundary from './components/ErrorBoundary'
+    useAppBridge,
+    useClientRouting,
+    useNavigate,
+} from "@shopify/app-bridge-react"
+import { authenticatedFetch } from "@shopify/app-bridge-utils"
+import { Redirect } from "@shopify/app-bridge/actions"
+import { AppProvider as PolarisProvider } from "@shopify/polaris"
+import translations from "@shopify/polaris/locales/en.json"
+import "@shopify/polaris/build/esm/styles.css"
+import { BrowserRouter, Routes, Route } from "react-router-dom"
+import GraphQLProvider from "./components/providers/GraphQLProvider"
+import AppBridgeProvider from "./components/providers/AppBridgeProvider"
+import { HomePage } from "./components/HomePage"
+import CreateWorkflow from "./components/CreateWorkflow"
+import Workflow from "./components/Workflow"
+import { ErrorBoundary } from "./components/ErrorBoundary"
 
 export default function App() {
-	return (
-		<ErrorBoundary>
-			<PolarisProvider i18n={translations}>
-				<BrowserRouter>
-					<AppBridgeProvider>
-						<GraphQLProvider>
-							{/* <NavigationMenu
+    return (
+        <ErrorBoundary>
+            <PolarisProvider i18n={translations}>
+                <BrowserRouter>
+                    <AppBridgeProvider>
+                        <GraphQLProvider>
+                            {/* <NavigationMenu
 								navigationLinks={[
 									{
 										label: 'Page name',
@@ -35,22 +31,22 @@ export default function App() {
 									},
 								]}
 							/> */}
-							<Routes>
-								<Route path='/' element={<HomePage />} />
-								<Route
-									path='/new'
-									element={<CreateWorkflow />}
-								/>
-								<Route path='/:topic' element={<Workflow />} />
-							</Routes>
-						</GraphQLProvider>
+                            <Routes>
+                                <Route path="/" element={<HomePage />} />
+                                <Route
+                                    path="/new"
+                                    element={<CreateWorkflow />}
+                                />
+                                <Route path="/:topic" element={<Workflow />} />
+                            </Routes>
+                        </GraphQLProvider>
 
-						<ShopifyRouterFix />
-					</AppBridgeProvider>
-				</BrowserRouter>
-			</PolarisProvider>
-		</ErrorBoundary>
-	)
+                        {/* <ShopifyRouterFix /> */}
+                    </AppBridgeProvider>
+                </BrowserRouter>
+            </PolarisProvider>
+        </ErrorBoundary>
+    )
 }
 
 // function ShopifyRouterFix() {

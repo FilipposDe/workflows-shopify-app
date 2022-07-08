@@ -2,11 +2,12 @@ import path from "path"
 import fs from "fs"
 import eslint from "eslint"
 import { fileURLToPath, pathToFileURL } from "url"
+
 import dbService from "./db.service.js"
-import { capUnderscoreToCamelCase } from "../../util/topics.js"
-import ApiError from "../helpers/ApiError.js"
 import logger from "../logger.js"
+import ApiError from "../helpers/ApiError.js"
 import { decrypt } from "../helpers/crypt.js"
+
 const { Workflows, Settings } = dbService
 
 // TODO more error handling

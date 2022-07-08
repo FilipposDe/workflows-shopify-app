@@ -1,5 +1,4 @@
-import logger from "../logger.js"
-import ApiError from "./../helpers/ApiError.js"
+import ApiError from "../helpers/ApiError"
 
 export const errorConverter = (err, req, res, next) => {
     let error = err
@@ -14,7 +13,7 @@ export const errorConverter = (err, req, res, next) => {
     next(error)
 }
 
-export const errorHandler = (err, req, res, next) => {
+export const errorHandler = (err, _req, res, _next) => {
     let { statusCode, message } = err
     if (process.env.NODE_ENV === "production" && !err.isOperational) {
         statusCode = 500

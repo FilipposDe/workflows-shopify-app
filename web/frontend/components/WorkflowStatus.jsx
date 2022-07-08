@@ -6,7 +6,6 @@ function WorkflowStatus(props) {
         <Stack>
             {workflow.published ? (
                 workflow.lintErrors ? (
-                    // <Badge status="success">Valid code</Badge>
                     <Badge status="critical">Lint errors</Badge>
                 ) : null
             ) : null}
@@ -18,7 +17,6 @@ function WorkflowStatus(props) {
 
             {workflow.published ? (
                 workflow.outdatedFileInServer ? (
-                    // <Badge status="success">Up to date</Badge>
                     <Badge status="critical">Outdated file</Badge>
                 ) : null
             ) : null}

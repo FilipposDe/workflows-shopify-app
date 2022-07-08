@@ -1,10 +1,3 @@
-import config from "./config.js"
-import dbService from "./services/db.service.js"
-import shopifyService from "./services/shopify.service.js"
-import { createServer } from "./server.js"
-import dynamicFilesService from "./services/dynamicFiles.service.js"
-import logger from "./logger.js"
-
 console.log("App: Starting")
 
 // Initialize the DB

@@ -15,12 +15,9 @@ function CustomModal(props) {
         text,
     } = props
 
-    // return null
-
     return (
         <Modal
             small={small || confirmation}
-            //   activator={props.activatorEl}
             open={isOpen}
             onClose={() => setIsOpen(false)}
             title={title || ""}

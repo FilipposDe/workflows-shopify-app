@@ -1,6 +1,6 @@
-import { capUnderscoreToCamelCase } from "../../util/topics"
+import { capUnderscoreToCamelCase } from "../../helpers/util"
 
-export default function getDefaultCode(topic) {
+function getDefaultCode(topic) {
     return `import { Shopify } from '%40shopify/shopify-api' // %40: temp. bug fix
 import { getConstant, getShopifyClientArgs } from '../util/util.js'
 
@@ -16,3 +16,5 @@ export default function ${capUnderscoreToCamelCase(
 }
 `
 }
+
+export default getDefaultCode

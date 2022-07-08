@@ -5,43 +5,33 @@ import {
     Page,
     Layout,
     Select,
-    Image,
     Stack,
-    Link,
-    Heading,
     Form,
-    TextField,
     Button,
     FormLayout,
-    OptionList,
     Frame,
-    Loading,
     Banner,
     Spinner,
-    Filters,
-    Badge,
 } from "@shopify/polaris"
-import useData from "../hooks/useData"
-import { capUnderscoreToCamelCase } from "../../util/topics"
-import Editor from "@monaco-editor/react"
-import React, { Suspense, useState } from "react"
+
+import { useState } from "react"
+
+import { codeDecode, codeEncode } from "../helpers/codeEncoding"
 import useFetch from "../hooks/useFetch"
 import useNav from "../hooks/useNav"
-// import CodeEditor from "./CodeEditor"
-import CustomModal from "./CustomModal"
-import WorkflowStatus from "./WorkflowStatus"
-import useToast from "../hooks/useToast"
-import { codeDecode, codeEncode } from "../helpers/codeEncoding"
+import { useToast } from "@shopify/app-bridge-react"
+import useData from "../hooks/useData"
 import CodeEditor from "./CodeEditor"
+import WorkflowStatus from "./WorkflowStatus"
 import getDefaultCode from "../helpers/defaultCode"
+import CustomModal from "./CustomModal"
 
 function Workflow() {
     const { topic } = useParams()
 
     const [data, setData] = useState({})
-    const [formError, setFormError] = useState("")
     const [saveLoading, setSaveLoading] = useState(false)
-    const [publishLoading, setPublishLoading] = useState(false)
+    const [formError, setFormError] = useState("")
     const [deleteLoading, setDeleteLoading] = useState(false)
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
 
@@ -52,17 +42,12 @@ function Workflow() {
 
     const [loadingStates, setLoadingStates] = useState({})
 
-    // const [deleteLoading, setDeleteLoading] = useState(false)
-    // const [publishLoading, setPublishLoading] = useState(false)
-
     const { workflow, workflowLoading, workflowError, workflowMutate } =
         useData(`/api/workflows/${topic}`, {
             resourceName: "workflow",
             onSuccess: (item) =>
                 setData({ ...item, code: codeDecode(item.code) }),
         })
-
-    // useEffect(() => {}, [third])
 
     const saveWorkflow = async (e) => {
         e?.preventDefault()
@@ -190,7 +175,7 @@ function Workflow() {
                                             <Select
                                                 label="Topic"
                                                 options={[data.topic]}
-                                                onChange={(v) => {}}
+                                                onChange={() => {}}
                                                 value={data.topic}
                                                 disabled
                                             />
@@ -236,13 +221,6 @@ function Workflow() {
                                             >
                                                 Reset
                                             </Button>
-                                            {/* <Button
-                                                outline
-                                                loading={publishLoading}
-                                                onClick={publishCurrentWorkflow}
-                                            >
-                                                Publish
-                                            </Button> */}
                                         </ButtonGroup>
                                     </FormLayout>
                                 </Form>

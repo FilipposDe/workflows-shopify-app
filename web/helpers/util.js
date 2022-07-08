@@ -1,7 +1,6 @@
 import { Shopify } from "@shopify/shopify-api"
 import config from "../config"
 import files from "../services/dynamicFiles.service"
-
 export const getConstant = files.getConstant
 
 export const getShopifyClientArgs = async () => {

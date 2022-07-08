@@ -1,5 +1,5 @@
 import express from "express"
-import apiController from "../controllers/api.controller.js"
+import apiController from "../controllers/api.controller"
 
 const apiRoutes = express.Router()
 

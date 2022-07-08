@@ -1,9 +1,10 @@
 import { Shopify } from "@shopify/shopify-api"
-import config from "../config.js"
-import sessionStorage from "../helpers/sessionStorage.js"
-import logger from "../logger.js"
-// import { webhookTopics } from "../constants.js"
-import dbService from "./db.service.js"
+import config from "../config"
+import logger from "../logger"
+import dbService from "./db.service"
+
+//
+
 const { Settings, Session } = dbService
 // import { getImport, dynamicFileExists } from "./dynamicFiles.service.js"
 

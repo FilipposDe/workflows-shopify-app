@@ -1,5 +1,4 @@
 import React from "react"
-import { Link } from "react-router-dom"
 
 export default class ErrorBoundary extends React.Component {
     constructor(props) {
@@ -11,7 +10,7 @@ export default class ErrorBoundary extends React.Component {
         return { error }
     }
 
-    componentDidCatch(error, errorInfo) {
+    componentDidCatch(_error, _errorInfo) {
         // logErrorToMyService(error, errorInfo)
     }
 
@@ -26,17 +25,16 @@ export default class ErrorBoundary extends React.Component {
     render() {
         if (this.state.error) {
             return (
-                <center>
+                <div>
                     <br />
                     <br />
                     <h1 style={{ maxWidth: "300px", fontSize: "16px" }}>
                         Something went wrong.
                         <br />
-                        {/* Go back <Link to="/">Home</Link> */}
                         <br />
                         <small>{this.getMessage(this.state.error)}</small>
                     </h1>
-                </center>
+                </div>
             )
         }
 

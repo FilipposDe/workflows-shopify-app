@@ -1,6 +1,7 @@
 import express from "express"
-import logger from "../logger.js"
-import shopifyService from "../services/shopify.service.js"
+import logger from "../logger"
+import shopifyService from "../services/shopify.service"
+
 const { Shopify } = shopifyService
 
 const webhookRoutes = express.Router()

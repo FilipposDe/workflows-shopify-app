@@ -1,7 +1,6 @@
-import { useMutation } from "react-query";
-import { GraphQLClient } from "graphql-request";
-
-import { useAuthenticatedFetch } from "./useAuthenticatedFetch.js";
+import { useMutation } from "react-query"
+import { GraphQLClient } from "graphql-request"
+import { useAuthenticatedFetch } from "./useAuthenticatedFetch"
 
 /**
  * A hook for mutating admin data.
@@ -12,14 +11,14 @@ import { useAuthenticatedFetch } from "./useAuthenticatedFetch.js";
  * @returns {Array} A tuple containing the mutation function and the mutation status.
  */
 export const useShopifyMutation = ({ query }) => {
-  const authenticatedFetch = useAuthenticatedFetch();
-  const graphQLClient = new GraphQLClient("/api/graphql", {
-    fetch: authenticatedFetch,
-  });
+    const authenticatedFetch = useAuthenticatedFetch()
+    const graphQLClient = new GraphQLClient("/api/graphql", {
+        fetch: authenticatedFetch,
+    })
 
-  const { mutateAsync, ...mutationProps } = useMutation(async (variables) =>
-    graphQLClient.rawRequest(query, variables)
-  );
+    const { mutateAsync, ...mutationProps } = useMutation(async (variables) =>
+        graphQLClient.rawRequest(query, variables)
+    )
 
-  return [mutateAsync, mutationProps];
-};
+    return [mutateAsync, mutationProps]
+}

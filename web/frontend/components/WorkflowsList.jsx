@@ -1,3 +1,4 @@
+import { useToast } from "@shopify/app-bridge-react"
 import {
     Button,
     TextStyle,
@@ -6,12 +7,12 @@ import {
     ResourceList,
     ResourceItem,
 } from "@shopify/polaris"
-import useNav from "../hooks/useNav"
+
+import { useState } from "react"
 import useData from "../hooks/useData"
 import useFetch from "../hooks/useFetch"
+import useNav from "../hooks/useNav"
 import WorkflowStatus from "./WorkflowStatus"
-import useToast from "../hooks/useToast"
-import { useState } from "react"
 
 export default function WorkflowsList() {
     const nav = useNav()
@@ -20,7 +21,6 @@ export default function WorkflowsList() {
     const { setToast, toastHtml } = useToast()
 
     const [loadingStates, setLoadingStates] = useState({})
-    // const [errorStates, setErrorStates] = useState({})
 
     const { workflows, workflowsLoading, workflowsError, workflowsRefetch } =
         useData(`/api/workflows`, {

@@ -1,10 +1,8 @@
+import { useToast } from "@shopify/app-bridge-react"
 import {
     Button,
-    TextStyle,
     Banner,
     Stack,
-    ResourceList,
-    ResourceItem,
     FormLayout,
     ButtonGroup,
     Form,
@@ -12,12 +10,10 @@ import {
     Spinner,
     Checkbox,
 } from "@shopify/polaris"
-import useNav from "../hooks/useNav"
+
+import { useState } from "react"
 import useData from "../hooks/useData"
 import useFetch from "../hooks/useFetch"
-import WorkflowStatus from "./WorkflowStatus"
-import useToast from "../hooks/useToast"
-import { useState } from "react"
 
 export default function ConstantsList() {
     const fetch = useFetch()

@@ -12,9 +12,3 @@ const LIB_SOURCES = {
 }
 
 export default LIB_SOURCES
-
-// GraphqlClient
-// RestClient
-// Common
-// Secrets
-// Constants

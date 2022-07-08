@@ -12,13 +12,14 @@ import {
     Banner,
     Spinner,
 } from "@shopify/polaris"
+
+import { useEffect, useState } from "react"
 import useData from "../hooks/useData"
-import React, { Suspense, useEffect, useState } from "react"
 import useFetch from "../hooks/useFetch"
 import useNav from "../hooks/useNav"
-// import CodeEditor from "./CodeEditor"
 import CodeEditor from "./CodeEditor"
 import getDefaultCode from "../helpers/defaultCode"
+//
 
 export default function CreateWorkflow() {
     const [data, setData] = useState({ topic: "", code: "" })
