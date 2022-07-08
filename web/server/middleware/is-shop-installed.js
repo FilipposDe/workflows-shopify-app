@@ -1,4 +1,4 @@
-import { DEBUG_MSG } from "../constants"
+import { DEBUG_MSG } from "../helpers/constants.js"
 
 export default function isShopInstalled() {
     return (req, res, next) => {

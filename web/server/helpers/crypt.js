@@ -1,5 +1,5 @@
 import crypto from "crypto"
-import config from "../config"
+import config from "../config.js"
 
 export function encrypt(text) {
     if (!text) return null

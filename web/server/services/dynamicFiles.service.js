@@ -2,7 +2,6 @@ import path from "path"
 import fs from "fs"
 import eslint from "eslint"
 import { fileURLToPath, pathToFileURL } from "url"
-
 import dbService from "./db.service.js"
 import logger from "../logger.js"
 import ApiError from "../helpers/ApiError.js"
@@ -54,13 +53,6 @@ function deleteImport(key) {
 
 function writeDynamicFile(fileName, text) {
     const filePath = getDynamicFilePath(fileName)
-    // const fileContent = `export default async function ${
-    //     fileName.split(".")[0]
-    //     // TODO continue work
-    // }(data) {
-    //     ${text}
-    // }`
-    // fs.writeFileSync(filePath, fileContent)
     fs.writeFileSync(filePath, text)
 }
 
@@ -98,13 +90,6 @@ function lintDynamicFile(fileName) {
         logger.error({ lintMessages })
         throw new Error("Linting error")
     }
-
-    // const functionName = fileName.split(".")[0]
-    // const textStart = `export default async function ${functionName}(data) {`
-    // const textEnd = `}`
-    // if (!trimmed.startsWith(textStart) || !trimmed.endsWith(textEnd)) {
-    //     return false
-    // }
 }
 
 function addFile(fileName, code) {
@@ -141,7 +126,6 @@ async function initServerFiles() {
     try {
         const allWorkflows = await Workflows.list()
         const publishedWorkflows = allWorkflows.filter((item) => item.published)
-        // const invalidWorkflows = []
         const validTopics = []
         for (const workflow of publishedWorkflows) {
             const { topic, code } = workflow
@@ -182,12 +166,6 @@ const getFunctionContents = (fileName) =>
         const text = fs.readFileSync(filePath, { encoding: "utf8" })
         const trimmed = text.toString().trim()
         let result = trimmed
-        // let result = ""
-        // result = trimmed.replace(
-        //     /^\s*export default async function [a-zA-Z]*\(data\) {\s*/,
-        //     ""
-        // )
-        // result = result.replace(/}\s*$/, "")
         resolve(result)
     })
 

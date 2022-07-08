@@ -1,7 +1,8 @@
 import react from "@vitejs/plugin-react"
-import "dotenv/config"
 import { dirname } from "path"
 import { fileURLToPath } from "url"
+import * as dotenv from "dotenv"
+dotenv.config({ path: "../../.env" })
 
 if (
     process.env.npm_lifecycle_event === "build" &&
@@ -25,9 +26,6 @@ const proxyOptions = {
  */
 const config = {
     root: dirname(fileURLToPath(import.meta.url)),
-    esbuild: {
-        jsxInject: `import React from 'react'`,
-    },
     define: {
         "process.env.SHOPIFY_API_KEY": JSON.stringify(
             process.env.SHOPIFY_API_KEY

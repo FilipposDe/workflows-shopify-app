@@ -1,7 +1,7 @@
 import { initializeApp, cert, applicationDefault } from "firebase-admin/app"
 import { getFirestore } from "firebase-admin/firestore"
 import { getStorage } from "firebase-admin/storage"
-import config from "../config"
+import config from "../config.js"
 
 let firestore
 let storage

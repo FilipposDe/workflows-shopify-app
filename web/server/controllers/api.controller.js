@@ -8,7 +8,7 @@ import ApiError from "../helpers/ApiError.js"
 import logger from "../logger.js"
 import catchAsync from "../helpers/catchAsync.js"
 import dynamicFilesService from "../services/dynamicFiles.service.js"
-import { WEBHOOK_TOPICS } from "../common/topic-list.js"
+import { WEBHOOK_TOPICS } from "../../common/topic-list.js"
 const { Shopify } = shopifyService
 const { Workflows, Settings } = dbService
 

@@ -1,7 +1,5 @@
 import { Shopify } from "@shopify/shopify-api"
-import config from "../config"
-import files from "../services/dynamicFiles.service"
-export const getConstant = files.getConstant
+import config from "../config.js"
 
 export const getShopifyClientArgs = async () => {
     const session = await Shopify.Utils.loadOfflineSession(config.SHOP)

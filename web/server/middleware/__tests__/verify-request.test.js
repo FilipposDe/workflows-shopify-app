@@ -3,8 +3,8 @@ import express from "express"
 import request from "supertest"
 import { describe, expect, test, vi } from "vitest"
 import jwt from "jsonwebtoken"
-import { serve } from "../../__tests__/serve"
-import verifyRequest from "../verify-request"
+import { serve } from "../../__tests__/serve.js"
+import verifyRequest from "../verify-request.js"
 
 describe("verify-request middleware", async () => {
     // this is only used to grab app wide constants

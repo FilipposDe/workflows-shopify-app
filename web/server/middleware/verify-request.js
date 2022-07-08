@@ -1,5 +1,6 @@
-import catchAsync from "../helpers/catchAsync"
-import shopifyService, { Shopify } from "../services/shopify.service"
+import catchAsync from "../helpers/catchAsync.js"
+import shopifyService from "../services/shopify.service.js"
+const { Shopify } = shopifyService
 
 const TEST_GRAPHQL_QUERY = `
 {

@@ -1,5 +1,6 @@
-import "dotenv/config"
 import { ApiVersion } from "@shopify/shopify-api"
+import * as dotenv from "dotenv"
+dotenv.config({ path: "../.env" })
 
 const SCOPES = "write_products,write_customers,write_draft_orders"
 

@@ -1,3 +1,9 @@
+import config from "./server/config.js"
+import { createServer } from "./server/server.js"
+import dbService from "./server/services/db.service.js"
+import dynamicFilesService from "./server/services/dynamicFiles.service.js"
+import shopifyService from "./server/services/shopify.service.js"
+
 console.log("App: Starting")
 
 // Initialize the DB

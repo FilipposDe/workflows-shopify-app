@@ -6,7 +6,7 @@ This is a custom, embedded Shopify app that allows you to write code inside its 
 
 ### Differences from Shopify's default app
 
--   Proper monorepo structure, using workspaces and a single node_modules folder
+-   Proper monorepo structure, using NPM Workspaces and a single node_modules folder (Shopify CLI will attempt to install dependencies in each package, so the `--skip-dependencies-installation` argument is used on the `dev` script)
 -   Auth routes are not middleware, they are part of the app's routes.
 -   The app is embedded with both offline and online tokens, and meant for one shop only
 

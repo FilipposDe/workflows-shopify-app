@@ -1,8 +1,8 @@
 import winston from "winston"
 
 import Transport from "winston-transport"
-import config from "./config"
-import dbService from "./services/db.service"
+import config from "./config.js"
+import dbService from "./services/db.service.js"
 
 const { Logs } = dbService
 

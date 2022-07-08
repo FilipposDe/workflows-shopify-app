@@ -1,6 +1,6 @@
 import express from "express"
-import logger from "../logger"
-import shopifyService from "../services/shopify.service"
+import logger from "../logger.js"
+import shopifyService from "../services/shopify.service.js"
 
 const { Shopify } = shopifyService
 

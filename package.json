@@ -5,7 +5,8 @@
     "scripts": {
         "shopify": "shopify",
         "build": "shopify app build",
-        "dev": "shopify app dev",
+        "dev": "shopify app dev --skip-dependencies-installation",
+        "dev:v": "shopify app dev --skip-dependencies-installation --verbose",
         "info": "shopify app info",
         "scaffold": "shopify app scaffold",
         "deploy": "shopify app deploy"
