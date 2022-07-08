@@ -1,4 +1,4 @@
-import { capUnderscoreToCamelCase } from "../../helpers/util"
+import { capUnderscoreToCamelCase } from "../../server/helpers/util"
 
 function getDefaultCode(topic) {
     return `import { Shopify } from '%40shopify/shopify-api' // %40: temp. bug fix

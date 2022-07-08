@@ -34,26 +34,17 @@ const config = {
     },
     plugins: [react()],
     resolve: {
-        preserveSymlinks: true,
+        // preserveSymlinks: true,
         alias: {
             path: "path-browserify",
         },
     },
     server: {
-        port: process.env.FRONTEND_PORT,
-        host: "localhost",
-
-        hmr: {
-            protocol: "ws",
-            host: "localhost",
-            port: 64999,
-            clientPort: 64999,
-        },
-        middlewareMode: "html",
-        proxy: {
-            "^/(\\?.*)?$": proxyOptions,
-            "^/api(/|(\\?.*)?$)": proxyOptions,
-        },
+        port: Number(process.env.FRONTEND_PORT),
+        // proxy: {
+        //     "^/(\\?.*)?$": proxyOptions,
+        //     "^/api(/|(\\?.*)?$)": proxyOptions,
+        // },
     },
     test: {
         globals: true,

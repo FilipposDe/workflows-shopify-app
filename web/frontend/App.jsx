@@ -14,7 +14,7 @@ import AppBridgeProvider from "./components/providers/AppBridgeProvider"
 import { HomePage } from "./components/HomePage"
 import CreateWorkflow from "./components/CreateWorkflow"
 import Workflow from "./components/Workflow"
-import { ErrorBoundary } from "./components/ErrorBoundary"
+import ErrorBoundary from "./components/ErrorBoundary"
 
 export default function App() {
     return (
