@@ -7,7 +7,7 @@ export default function isShopInstalled() {
             const { shop } = req.query
             console.log(DEBUG_MSG.SHOP_NOT_INSTALLED)
             if (!shop) return res.status(500).send("Missing shop param")
-            res.redirect(`/auth/install?shop=${shop}`)
+            res.redirect(`/api/auth/install?shop=${shop}`)
         } else {
             next()
         }

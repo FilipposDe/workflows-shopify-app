@@ -6,18 +6,6 @@ import logger from "../logger.js"
 import dbService from "./db.service.js"
 const { Settings, Session } = dbService
 // import { getImport, dynamicFileExists } from "./dynamicFiles.service.js"
-async function handleStoreUninstall() {
-    try {
-        await Settings.put("isInstalled", false)
-        const allSessionsInDB = await Session.list()
-        for await (const session of allSessionsInDB) {
-            await Session.deleteById(session.id)
-        }
-        console.log("App: Store uninstalled, cleared all sessions")
-    } catch (error) {
-        logger.error("DB error while handling store uninstall", error)
-    }
-}
 
 function initContext() {
     try {
@@ -26,6 +14,7 @@ function initContext() {
             API_SECRET_KEY: config.SHOPIFY_API_SECRET,
             SCOPES: config.SCOPES.split(","),
             HOST_NAME: config.HOST.replace(/https:\/\//, ""),
+            HOST_SCHEME: config.HOST.split("://")[0],
             API_VERSION: config.SHOPIFY_API_VERSION,
             IS_EMBEDDED_APP: true,
             SESSION_STORAGE: sessionStorage,
@@ -57,6 +46,19 @@ function addExistingHandlers(topics, getHandler) {
         process.exit(1)
     }
     console.log("App: Added existing webhook handlers to registry")
+}
+
+async function handleStoreUninstall() {
+    try {
+        await Settings.put("isInstalled", false)
+        const allSessionsInDB = await Session.list()
+        for await (const session of allSessionsInDB) {
+            await Session.deleteById(session.id)
+        }
+        console.log("App: Store uninstalled, cleared all sessions")
+    } catch (error) {
+        logger.error("DB error while handling store uninstall", error)
+    }
 }
 
 function addUninstallHandler() {
@@ -116,25 +118,6 @@ function createApiClient(accessToken, isGraphql = true) {
     }
 }
 
-// function addAvailableTopicHandlers() {
-//     for (const topic of webhookTopics) {
-//         Shopify.Webhooks.Registry.addHandler(topic, {
-//             path: "/webhooks",
-//             webhookHandler: async (data) => {
-//                 const fileName = Workflows.getFileNameFromTopic(topic)
-//                 if (dynamicFileExists(fileName)) {
-//                     const { default: defaultHandler } = getImport(fileName)
-//                     await defaultHandler(data)
-//                     console.log("Webhook was handled by file")
-//                     return
-//                     // TODO continue work
-//                 }
-//                 console.log("Webhook was not handled by any file")
-//             },
-//         })
-//     }
-// }
-
 const shopifyService = {
     handleStoreUninstall,
     initContext,
@@ -144,7 +127,6 @@ const shopifyService = {
     addExistingHandlers,
     reRegisterExistingWebhooks,
     getHandler,
-    // addAvailableTopicHandlers,
 }
 
 export default shopifyService

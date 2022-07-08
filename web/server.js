@@ -53,41 +53,36 @@ export async function createServer(
     const app = express()
     await setServerSettings(app)
     app.use(cookieParser(Shopify.Context.API_SECRET_KEY))
-    app.use("/auth", authRoutes)
+    app.use("/api/auth", authRoutes)
     app.use("/webhooks", webhookRoutes)
-    app.use("/graphql", verifyRequest(app), graphqlRoutes)
-    app.use(express.json())
-    app.use("/api", verifyRequest(app), apiRoutes)
-    app.use(cspHeaders())
-    app.use("/*", isShopInstalled())
+    app.use("/api/*", verifyRequest(app))
+    app.use("/api/graphql", graphqlRoutes)
+    app.use("/api", express.json(), apiRoutes)
 
-    let vite
-    if (!isProd) {
-        vite = await import("vite").then(({ createServer }) =>
-            createServer(getViteDevOpts(root))
-        )
-        app.use(vite.middlewares)
-    } else {
+    if (isProd) {
         const compression = await import("compression").then(
             ({ default: fn }) => fn
         )
         const serveStatic = await import("serve-static").then(
             ({ default: fn }) => fn
         )
-        const fs = await import("fs")
         app.use(compression())
-        app.use(serveStatic(resolve("dist/client")))
-        app.use("/*", (_req, res, _next) => {
-            res.status(200)
-                .set("Content-Type", "text/html")
-                .send(
-                    fs.readFileSync(`${process.cwd()}/dist/client/index.html`)
-                )
-        })
+        app.use(serveStatic(resolve("frontend/dist")))
     }
+
+    app.use("/*", cspHeaders(), isShopInstalled(), async (_req, res) => {
+        const fs = await import("fs")
+        const indexUrl = isProd
+            ? `${process.cwd()}/frontend/dist/index.html`
+            : `${process.cwd()}/frontend/index.html`
+
+        res.status(200)
+            .set("Content-Type", "text/html")
+            .send(fs.readFileSync(indexUrl))
+    })
 
     app.use(errorConverter)
     app.use(errorHandler)
 
-    return { app, vite }
+    return { app }
 }

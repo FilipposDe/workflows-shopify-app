@@ -1,12 +1,12 @@
 import express from "express"
-// import { DEBUG_MSG } from "../helpers/constants.js"
-// import catchAsync from "../helpers/catchAsync.js"
-// import topLevelAuthRedirect from "../helpers/top-level-auth-redirect.js"
-// import dbService from "../services/db.service.js"
-// import shopifyService from "../services/shopify.service.js"
-// import logger from "../logger.js"
-// const { Shopify } = shopifyService
-// const { Settings } = dbService
+import { DEBUG_MSG } from "../helpers/constants.js"
+import catchAsync from "../helpers/catchAsync.js"
+import topLevelAuthRedirect from "../helpers/top-level-auth-redirect.js"
+import dbService from "../services/db.service.js"
+import shopifyService from "../services/shopify.service.js"
+import logger from "../logger.js"
+const { Shopify } = shopifyService
+const { Settings } = dbService
 
 const authRoutes = express.Router()
 
