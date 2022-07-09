@@ -69,14 +69,14 @@ export async function createServer(
             ({ default: fn }) => fn
         )
         app.use(compression())
-        app.use(serveStatic(resolve("frontend/dist")))
+        app.use(serveStatic(resolve("../frontend/dist")))
     }
 
     app.use("/*", cspHeaders(), isShopInstalled(), async (_req, res) => {
         const fs = await import("fs")
         const indexUrl = isProd
-            ? `${process.cwd()}/frontend/dist/index.html`
-            : `${process.cwd()}/frontend/index.html`
+            ? `${process.cwd()}/../frontend/dist/index.html`
+            : `${process.cwd()}/../frontend/index.html`
 
         res.status(200)
             .set("Content-Type", "text/html")

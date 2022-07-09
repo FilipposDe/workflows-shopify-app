@@ -1,11 +1,11 @@
 import { ApiVersion } from "@shopify/shopify-api"
 import * as dotenv from "dotenv"
-dotenv.config({ path: "../.env" })
+dotenv.config({ path: "../../.env" })
 
 const SCOPES = "write_products,write_customers,write_draft_orders"
 
 const optionalEnvVars = [
-    "PORT",
+    "BACKEND_PORT",
     "VITE_TEST_BUILD",
     "GOOGLE_APPLICATION_CREDENTIALS",
 ]
@@ -26,7 +26,7 @@ const requiredEnvVars = [
 
 const configVars = {
     TOP_LEVEL_OAUTH_COOKIE: "shopify_top_level_oauth",
-    SHOPIFY_API_VERSION: ApiVersion.April22,
+    SHOPIFY_API_VERSION: ApiVersion.July22,
 }
 
 function validateEnv() {
@@ -50,7 +50,7 @@ function generateConfigObj() {
     }
     Object.assign(config, configVars)
     config.SCOPES = SCOPES
-    config.PORT = parseInt(config.PORT || "8081", 10)
+    config.BACKEND_PORT = parseInt(config.BACKEND_PORT || "8081", 10)
     config.isTest = config.NODE_ENV === "test" || !!config.VITE_TEST_BUILD
     config.isProd = config.NODE_ENV === "production"
     config.isDev = config.NODE_ENV === "development"

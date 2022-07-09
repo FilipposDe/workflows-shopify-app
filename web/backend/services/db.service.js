@@ -1,10 +1,11 @@
-import { capUnderscoreToCamelCase } from "../../common/util.js"
 import firebaseService from "./firebase.service.js"
+import { capUnderscoreToCamelCase } from "../../common/util.js"
+import logger from "../logger.js"
 
 function init() {
     try {
         firebaseService.db.initDB()
-        console.log("App: Initialized DB")
+        logger.info("App: Initialized DB")
     } catch (error) {
         console.error("Failed to init DB, exiting.", error)
         process.exit(1)

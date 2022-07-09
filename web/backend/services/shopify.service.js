@@ -18,7 +18,8 @@ function initContext() {
             IS_EMBEDDED_APP: true,
             SESSION_STORAGE: sessionStorage,
         })
-        console.log("App: Initialized Shopify Context")
+
+        logger.info("App: Initialized Shopify Context")
     } catch (error) {
         logger.error("Error during Shopify Context init, exiting.", error)
         process.exit(1)
@@ -44,7 +45,7 @@ function addExistingHandlers(topics, getHandler) {
         )
         process.exit(1)
     }
-    console.log("App: Added existing webhook handlers to registry")
+    logger.info("App: Added existing webhook handlers to registry")
 }
 
 async function handleStoreUninstall() {
@@ -54,7 +55,7 @@ async function handleStoreUninstall() {
         for await (const session of allSessionsInDB) {
             await Session.deleteById(session.id)
         }
-        console.log("App: Store uninstalled, cleared all sessions")
+        logger.info("App: Store uninstalled, cleared all sessions")
     } catch (error) {
         logger.error("DB error while handling store uninstall", error)
     }
@@ -66,7 +67,7 @@ function addUninstallHandler() {
             path: "/webhooks",
             webhookHandler: handleStoreUninstall,
         })
-        console.log("App: Registered uninstall webhook")
+        logger.info("App: Registered uninstall webhook")
     } catch (error) {
         logger.error(
             "Error while registering APP_UNINSTALLED webhook, exiting.",
@@ -78,6 +79,13 @@ function addUninstallHandler() {
 
 async function reRegisterExistingWebhooks() {
     try {
+        const isShopInstalled = await Settings.get("isInstalled")
+        if (!isShopInstalled) {
+            logger.info(
+                "App: App is not installed, didn't re-register any webhooks"
+            )
+            return
+        }
         const offlineSession = await Shopify.Utils.loadOfflineSession(
             config.SHOP
         )
@@ -95,7 +103,7 @@ async function reRegisterExistingWebhooks() {
             }
         }
 
-        console.log("App: Re-registered existing webhooks")
+        logger.info("App: Re-registered existing webhooks")
     } catch (error) {
         logger.error("Error while registering webhooks, exiting.", error)
         process.exit(1)

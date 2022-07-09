@@ -108,7 +108,7 @@ function getImport(topic) {
 
 async function setConstants() {
     const constantsStr = await Settings.get("constants")
-    const constants = JSON.parse(constantsStr) || []
+    const constants = JSON.parse(constantsStr || "[]")
     for (const { name, value, encrypt: isEncrypted } of constants) {
         CONSTANTS[name] = isEncrypted ? decrypt(value) : value
     }

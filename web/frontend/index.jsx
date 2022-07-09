@@ -1,6 +1,8 @@
 import ReactDOM from "react-dom"
-// import path from "path-browserify"
+// import App from "./App"
 
-import App from "./App"
+const App = (props) => {
+    return "wassa"
+}
 
 ReactDOM.render(<App />, document.getElementById("app"))

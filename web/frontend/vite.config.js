@@ -14,6 +14,13 @@ if (
     )
 }
 
+const hmrConfig = {
+    protocol: "ws",
+    host: "localhost",
+    port: 64999,
+    clientPort: 64999,
+}
+
 const proxyOptions = {
     target: `http://127.0.0.1:${process.env.BACKEND_PORT}`,
     changeOrigin: false,
@@ -34,17 +41,17 @@ const config = {
     },
     plugins: [react()],
     resolve: {
-        // preserveSymlinks: true,
+        preserveSymlinks: true,
         alias: {
             path: "path-browserify",
         },
     },
     server: {
-        port: Number(process.env.FRONTEND_PORT),
-        // proxy: {
-        //     "^/(\\?.*)?$": proxyOptions,
-        //     "^/api(/|(\\?.*)?$)": proxyOptions,
-        // },
+        port: process.env.FRONTEND_PORT,
+        proxy: {
+            "^/(\\?.*)?$": proxyOptions,
+            "^/api(/|(\\?.*)?$)": proxyOptions,
+        },
     },
     test: {
         globals: true,

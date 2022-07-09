@@ -1,10 +1,11 @@
-import config from "./server/config.js"
-import { createServer } from "./server/server.js"
-import dbService from "./server/services/db.service.js"
-import dynamicFilesService from "./server/services/dynamicFiles.service.js"
-import shopifyService from "./server/services/shopify.service.js"
+import config from "./config.js"
+import logger from "./logger.js"
+import { createServer } from "./server.js"
+import dbService from "./services/db.service.js"
+import dynamicFilesService from "./services/dynamicFiles.service.js"
+import shopifyService from "./services/shopify.service.js"
 
-console.log("App: Starting")
+logger.info("App: Starting")
 
 // Initialize the DB
 dbService.init()
@@ -29,7 +30,7 @@ await shopifyService.reRegisterExistingWebhooks()
 
 if (!config.isTest) {
     const { app } = await createServer()
-    app.listen(config.PORT)
-    console.log(`App: Server listening on port ${config.PORT}`)
-    console.log("App: Ready")
+    app.listen(config.BACKEND_PORT)
+    logger.info(`App: Server listening on port ${config.BACKEND_PORT}`)
+    logger.info("App: Ready")
 }
