@@ -8,29 +8,35 @@
 import { AppProvider as PolarisProvider } from "@shopify/polaris"
 import translations from "@shopify/polaris/locales/en.json"
 import "@shopify/polaris/build/esm/styles.css"
-import { BrowserRouter, Routes, Route } from "react-router-dom"
+import { BrowserRouter } from "react-router-dom"
+// import { BrowserRouter, Routes, Route } from "react-router-dom"
 import GraphQLProvider from "./components/providers/GraphQLProvider"
 import AppBridgeProvider from "./components/providers/AppBridgeProvider"
 import ErrorBoundary from "./components/ErrorBoundary"
+import { NavigationMenu } from "@shopify/app-bridge-react"
+import Routes from "./Routes"
 // import { HomePage } from "./components/HomePage"
 // import CreateWorkflow from "./components/CreateWorkflow"
 // import Workflow from "./components/Workflow"
 
+const pages = import.meta.globEager("./pages/**/!(*.test.[jt]sx)*.([jt]sx)")
+
 export default function App() {
     return (
         <ErrorBoundary>
-            <PolarisProvider i18n={translations}>
+            <PolarisProvider>
                 <BrowserRouter>
                     <AppBridgeProvider>
                         <GraphQLProvider>
-                            {/* <NavigationMenu
-								navigationLinks={[
-									{
-										label: 'Page name',
-										destination: '/pagename',
-									},
-								]}
-							/> */}
+                            <NavigationMenu
+                                navigationLinks={[
+                                    {
+                                        label: "Page name",
+                                        destination: "/pagename",
+                                    },
+                                ]}
+                            />
+                            <Routes pages={pages} />
                             {/* <Routes>
                                 <Route path="/" element={<HomePage />} />
                                 <Route
@@ -39,7 +45,6 @@ export default function App() {
                                 />
                                 <Route path="/:topic" element={<Workflow />} />
                             </Routes> */}
-                            H
                         </GraphQLProvider>
 
                         {/* <ShopifyRouterFix /> */}

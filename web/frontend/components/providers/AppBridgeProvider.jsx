@@ -9,6 +9,7 @@ import { Banner, Layout, Page } from "@shopify/polaris"
  * 2. Configures the App Bridge Provider, which unlocks functionality provided by the host.
  *
  */
+
 function AppBridgeProvider({ children }) {
     const location = useLocation()
     const navigate = useNavigate()
@@ -37,6 +38,7 @@ function AppBridgeProvider({ children }) {
             window.__SHOPIFY_DEV_HOST
 
         window.__SHOPIFY_DEV_HOST = host
+        console.log({ host })
 
         return {
             host,
