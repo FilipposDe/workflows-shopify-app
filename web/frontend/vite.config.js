@@ -1,9 +1,10 @@
-import react from "@vitejs/plugin-react"
+// import react from "@vitejs/plugin-react"
 import { dirname } from "path"
 import { fileURLToPath } from "url"
 import * as dotenv from "dotenv"
+import { defineConfig } from "vite"
 dotenv.config({ path: "../../.env" })
-
+console.log({ p: process.env.HOST })
 if (
     process.env.npm_lifecycle_event === "build" &&
     !process.env.CI &&
@@ -14,18 +15,36 @@ if (
     )
 }
 
-const hmrConfig = {
-    protocol: "ws",
-    host: "localhost",
-    port: 64999,
-    clientPort: 64999,
-}
-
 const proxyOptions = {
     target: `http://127.0.0.1:${process.env.BACKEND_PORT}`,
     changeOrigin: false,
     secure: true,
     ws: false,
+}
+
+const host = process.env.HOST
+    ? process.env.HOST.replace(/https:\/\//, "")
+    : undefined
+
+// HMR doesn't work on Firefox using localhost, so you can temporarily get that to work by setting the
+// SHOPIFY_VITE_HMR_USE_POLLING env var when running this
+let hmrConfig
+if (process.env.SHOPIFY_VITE_HMR_USE_POLLING) {
+    throw new Error("Env requires polling")
+} else if (process.env.SHOPIFY_VITE_HMR_USE_WSS) {
+    hmrConfig = {
+        protocol: host ? "wss" : "ws",
+        host: host || "localhost",
+        port: process.env.FRONTEND_PORT,
+        clientPort: 443,
+    }
+} else {
+    hmrConfig = {
+        protocol: "ws",
+        host: "localhost",
+        port: 64999,
+        clientPort: 64999,
+    }
 }
 
 /**
@@ -39,7 +58,10 @@ const config = {
         ),
         "process.env.HOST": JSON.stringify(process.env.HOST),
     },
-    plugins: [react()],
+    // plugins: [react()],
+    esbuild: {
+        jsxInject: `import React from 'react'`,
+    },
     resolve: {
         preserveSymlinks: true,
         alias: {
@@ -52,6 +74,8 @@ const config = {
             "^/(\\?.*)?$": proxyOptions,
             "^/api(/|(\\?.*)?$)": proxyOptions,
         },
+        host: "localhost",
+        hmr: hmrConfig,
     },
     test: {
         globals: true,
@@ -63,4 +87,4 @@ const config = {
     },
 }
 
-export default config
+export default defineConfig(config)

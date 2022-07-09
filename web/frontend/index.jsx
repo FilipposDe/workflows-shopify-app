@@ -1,8 +1,4 @@
 import ReactDOM from "react-dom"
-// import App from "./App"
-
-const App = (props) => {
-    return "wassa"
-}
+import App from "./App"
 
 ReactDOM.render(<App />, document.getElementById("app"))
