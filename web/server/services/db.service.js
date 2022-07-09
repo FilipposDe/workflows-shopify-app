@@ -1,4 +1,4 @@
-import { capUnderscoreToCamelCase } from "../helpers/util.js"
+import { capUnderscoreToCamelCase } from "../../common/util.js"
 import firebaseService from "./firebase.service.js"
 
 function init() {

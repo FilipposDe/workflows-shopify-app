@@ -28,7 +28,12 @@ export default class ErrorBoundary extends React.Component {
                 <div>
                     <br />
                     <br />
-                    <h1 style={{ maxWidth: "300px", fontSize: "16px" }}>
+                    <h1
+                        style={{
+                            fontSize: "16px",
+                            textAlign: "center",
+                        }}
+                    >
                         Something went wrong.
                         <br />
                         <br />
