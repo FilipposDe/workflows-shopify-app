@@ -3,6 +3,7 @@ import * as dotenv from "dotenv"
 dotenv.config({ path: "../../.env" })
 
 const optionalEnvVars = [
+    "PORT",
     "BACKEND_PORT",
     "VITE_TEST_BUILD",
     "GOOGLE_APPLICATION_CREDENTIALS",
@@ -39,7 +40,7 @@ function validateEnv() {
     }
 }
 
-function generateConfigObj() {
+function createConfig() {
     const config = {}
     for (const key of optionalEnvVars) {
         config[key] = process.env[key]
@@ -57,6 +58,6 @@ function generateConfigObj() {
 }
 
 validateEnv()
-const config = generateConfigObj()
+const config = createConfig()
 
 export default config
