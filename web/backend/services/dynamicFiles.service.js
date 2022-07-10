@@ -43,7 +43,7 @@ async function dynamicallyImportFile(fileName) {
 }
 
 function getDynamicFilePath(fileName) {
-    const filePath = path.join(__dirname, "..", "..", "storage", fileName)
+    const filePath = path.join(__dirname, "..", "storage", fileName)
     return filePath
 }
 

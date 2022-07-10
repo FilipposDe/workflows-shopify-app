@@ -89,6 +89,11 @@ async function reRegisterExistingWebhooks() {
         const offlineSession = await Shopify.Utils.loadOfflineSession(
             config.SHOP
         )
+        if (!offlineSession.accessToken) {
+            throw new Error(
+                "No offline access token for session, please remove the isInstalled setting and install the app again."
+            )
+        }
         const response = await Shopify.Webhooks.Registry.registerAll({
             shop: config.SHOP,
             accessToken: offlineSession.accessToken,
