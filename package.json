@@ -10,11 +10,11 @@
         "info": "shopify app info",
         "scaffold": "shopify app scaffold",
         "deploy": "shopify app deploy",
-        "heroku-postbuild": "npm run web/frontend:build",
-        "start": "npm run web/backend:serve"
+        "heroku-postbuild": "npm run build -w web/frontend",
+        "start": "npm run serve -w web/backend"
     },
     "workspaces": [
-        "web/backend",
+        "web/*",
         "web/frontend"
     ],
     "dependencies": {
