@@ -48,7 +48,7 @@ function generateConfigObj() {
         config[key] = process.env[key]
     }
     Object.assign(config, configVars)
-    config.BACKEND_PORT = parseInt(config.BACKEND_PORT || "8081", 10)
+    config.BACKEND_PORT = parseInt(config.BACKEND_PORT || config.PORT, 10)
     config.isTest = config.NODE_ENV === "test" || !!config.VITE_TEST_BUILD
     config.isProd = config.NODE_ENV === "production"
     config.isDev = config.NODE_ENV === "development"
