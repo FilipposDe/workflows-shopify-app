@@ -1,5 +1,9 @@
 import { Component } from "react"
 
+const COMMON_TYPES = {
+    "APP::ERROR::INVALID_CONFIG": "Info: APP::ERROR::INVALID_CONFIG",
+}
+
 export default class ErrorBoundary extends Component {
     constructor(props) {
         super(props)
@@ -15,29 +19,28 @@ export default class ErrorBoundary extends Component {
     }
 
     getMessage(error) {
-        let result = ""
-        if (error?.type === "APP::ERROR::INVALID_CONFIG") {
-            result += "Info: APP::ERROR::INVALID_CONFIG"
-        }
-        return result
+        return COMMON_TYPES[error.type] || ""
     }
 
     render() {
         if (this.state.error) {
             return (
                 <div>
-                    <br />
-                    <br />
                     <h1
                         style={{
                             fontSize: "16px",
                             textAlign: "center",
+                            marginTop: "40px",
                         }}
                     >
                         Something went wrong.
-                        <br />
-                        <br />
-                        <small>{this.getMessage(this.state.error)}</small>
+                        <small
+                            style={{
+                                marginTop: "30px",
+                            }}
+                        >
+                            {this.getMessage(this.state.error)}
+                        </small>
                     </h1>
                 </div>
             )

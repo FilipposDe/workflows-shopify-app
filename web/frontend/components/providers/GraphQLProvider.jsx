@@ -6,8 +6,9 @@ import {
 } from "react-query"
 
 /**
- * Sets up the QueryClientProvider from react-query.
- * @desc See: https://react-query.tanstack.com/reference/QueryClientProvider#_top
+ * Wrapper for the QueryClientProvider from react-query.
+ * @param {*} children
+ * @returns {React.ReactElement}
  */
 function GraphQLProvider({ children }) {
     const client = new QueryClient({

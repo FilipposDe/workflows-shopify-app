@@ -1,6 +1,6 @@
 import { Spinner, Stack } from "@shopify/polaris"
-import React, { Suspense } from "react"
-const Editor = React.lazy(() => import("@monaco-editor/react"))
+import { Suspense, lazy } from "react"
+const Editor = lazy(() => import("@monaco-editor/react"))
 
 async function addAutoTypes(editor, monaco) {
     const { AutoTypings } = await import("monaco-editor-auto-typings")

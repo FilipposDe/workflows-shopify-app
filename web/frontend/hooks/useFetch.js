@@ -10,7 +10,8 @@ class HttpError extends Error {
 
 function useFetch() {
     const app = useAppBridge()
-    const appFetch = userLoggedInFetch(app)
+    const appFetch = () => null
+    // const appFetch = userLoggedInFetch(app) // TODO
 
     async function fetchAPI(
         url,

@@ -12,12 +12,13 @@ import {
     Banner,
     Spinner,
 } from "@shopify/polaris"
+import { TitleBar } from "@shopify/app-bridge-react"
 
 import { useEffect, useState } from "react"
 import useData from "../hooks/useData"
 import useFetch from "../hooks/useFetch"
 import useNav from "../hooks/useNav"
-import CodeEditor from "./CodeEditor"
+import CodeEditor from "../components/CodeEditor"
 import getDefaultCode from "../helpers/defaultCode"
 //
 
@@ -77,19 +78,19 @@ export default function CreateWorkflow() {
 
     return (
         <Frame>
-            <Page
-                title="Create workflow"
-                fullWidth
-                primaryAction={{
-                    content: "Save",
-                    disabled: !data.topic,
-                    loading: saveLoading,
-                    onAction: () => saveWorkflow(),
-                }}
-                breadcrumbs={[
-                    { content: "Workflows", onAction: () => nav("/") },
-                ]}
-            >
+            <Page fullWidth>
+                <TitleBar
+                    title="Create workflow"
+                    primaryAction={{
+                        content: "Save",
+                        disabled: !data.topic,
+                        loading: saveLoading,
+                        onAction: () => saveWorkflow(),
+                    }}
+                    breadcrumbs={[
+                        { content: "Workflows", onAction: () => nav("/") },
+                    ]}
+                />
                 <Layout>
                     <Layout.Section>
                         <Card sectioned>

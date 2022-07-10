@@ -1,7 +1,3 @@
-// import {
-//     useAppBridge,
-//     useClientRouting,
-//     useNavigate,
 // } from "@shopify/app-bridge-react"
 // import { authenticatedFetch } from "@shopify/app-bridge-utils"
 // import { Redirect } from "@shopify/app-bridge/actions"
@@ -16,7 +12,6 @@ import ErrorBoundary from "./components/ErrorBoundary"
 import { NavigationMenu } from "@shopify/app-bridge-react"
 import Routes from "./Routes"
 // import { HomePage } from "./components/HomePage"
-// import CreateWorkflow from "./components/CreateWorkflow"
 // import Workflow from "./components/Workflow"
 
 const pages = import.meta.globEager("./pages/**/!(*.test.[jt]sx)*.([jt]sx)")
@@ -31,40 +26,19 @@ export default function App() {
                             <NavigationMenu
                                 navigationLinks={[
                                     {
-                                        label: "Page name",
-                                        destination: "/pagename",
+                                        label: "New workflow",
+                                        destination: "/new",
                                     },
                                 ]}
                             />
                             <Routes pages={pages} />
-                            {/* <Routes>
-                                <Route path="/" element={<HomePage />} />
-                                <Route
-                                    path="/new"
-                                    element={<CreateWorkflow />}
-                                />
-                                <Route path="/:topic" element={<Workflow />} />
-                            </Routes> */}
                         </GraphQLProvider>
-
-                        {/* <ShopifyRouterFix /> */}
                     </AppBridgeProvider>
                 </BrowserRouter>
             </PolarisProvider>
         </ErrorBoundary>
     )
 }
-
-// function ShopifyRouterFix() {
-// 	const navigate = useNavigate()
-// 	function replace(path) {
-// 		navigate(path)
-// 	}
-// 	useClientRouting({
-// 		replace,
-// 	})
-// 	return null
-// }
 
 // export function userLoggedInFetch(app) {
 // 	const fetchFunction = authenticatedFetch(app)

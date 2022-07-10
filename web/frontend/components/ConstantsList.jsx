@@ -106,7 +106,7 @@ export default function ConstantsList() {
 
     return (
         <>
-            <style jsx>
+            <style jsx="true">
                 {`
                     [id^="value-encrypt"] {
                         -webkit-text-security: disc;

@@ -4,15 +4,36 @@ import { Provider } from "@shopify/app-bridge-react"
 import { Banner, Layout, Page } from "@shopify/polaris"
 
 /**
- *
- * 1. Ensures that navigating inside the app updates the host URL.
- * 2. Configures the App Bridge Provider, which unlocks functionality provided by the host.
- *
+ * Stores the initial host param, returns the
+ * config object for the App Bridge Provider.
+ * @returns {Object}
  */
+function useAppBridgeConfig() {
+    const location = useLocation()
+    // Store the host, which may be present initially,
+    // but later removed by navigation.
+    const [appBridgeConfig] = useState(() => {
+        const hostParam = new URLSearchParams(location.search).get("host")
+        const host = hostParam || window.__SHOPIFY_DEV_HOST
+        window.__SHOPIFY_DEV_HOST = host
+        return {
+            host,
+            apiKey: process.env.SHOPIFY_API_KEY,
+            forceRedirect: true,
+        }
+    })
 
-function AppBridgeProvider({ children }) {
+    return appBridgeConfig
+}
+
+/**
+ * Ensures that navigating inside the app updates the host URL.
+ * @returns {Object}
+ */
+function useRouterConfig() {
     const location = useLocation()
     const navigate = useNavigate()
+
     const history = useMemo(
         () => ({
             replace: (path) => {
@@ -27,46 +48,35 @@ function AppBridgeProvider({ children }) {
         [history, location]
     )
 
-    // The host may be present initially, but later removed by navigation.
-    // By caching this in state, we ensure that the host is never lost.
-    // During the lifecycle of an app, these values should never be updated anyway.
-    // Using state in this way is preferable to useMemo.
-    // See: https://stackoverflow.com/questions/60482318/version-of-usememo-for-caching-a-value-that-will-never-change
-    const [appBridgeConfig] = useState(() => {
-        const host =
-            new URLSearchParams(location.search).get("host") ||
-            window.__SHOPIFY_DEV_HOST
+    return routerConfig
+}
 
-        window.__SHOPIFY_DEV_HOST = host
-        console.log({ host })
+const noApiKeyFoundHtml = (
+    <Page narrowWidth>
+        <Layout>
+            <Layout.Section>
+                <div style={{ marginTop: "100px" }}>
+                    <Banner title="Missing Shopify API key" status="critical">
+                        Your app is running without the SHOPIFY_API_KEY
+                        environment variable. Please ensure that it is set when
+                        running or building your React app.
+                    </Banner>
+                </div>
+            </Layout.Section>
+        </Layout>
+    </Page>
+)
 
-        return {
-            host,
-            apiKey: process.env.SHOPIFY_API_KEY,
-            forceRedirect: true,
-        }
-    })
+/**
+ * Wrapper for the App Bridge Provider.
+ * @param {*} children
+ * @returns {React.ReactElement}
+ */
+function AppBridgeProvider({ children }) {
+    const appBridgeConfig = useAppBridgeConfig()
+    const routerConfig = useRouterConfig()
 
-    if (!process.env.SHOPIFY_API_KEY) {
-        return (
-            <Page narrowWidth>
-                <Layout>
-                    <Layout.Section>
-                        <div style={{ marginTop: "100px" }}>
-                            <Banner
-                                title="Missing Shopify API key"
-                                status="critical"
-                            >
-                                Your app is running without the SHOPIFY_API_KEY
-                                environment variable. Please ensure that it is
-                                set when running or building your React app.
-                            </Banner>
-                        </div>
-                    </Layout.Section>
-                </Layout>
-            </Page>
-        )
-    }
+    if (!process.env.SHOPIFY_API_KEY) return noApiKeyFoundHtml
 
     return (
         <Provider config={appBridgeConfig} router={routerConfig}>
