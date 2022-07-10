@@ -18,7 +18,7 @@ import useFetch from "../hooks/useFetch"
 export default function ConstantsList() {
     const fetch = useFetch()
 
-    const { setToast, toastHtml } = useToast()
+    const { show: showToast } = useToast()
 
     const { constantsLoading, constantsError, constantsMutate } = useData(
         `/api/constants`,
@@ -70,7 +70,7 @@ export default function ConstantsList() {
         console.log(responseData)
         constantsMutate([...responseData.constants])
         setData([...responseData.constants])
-        setToast("Saved")
+        showToast("Saved")
     }
 
     if (constantsLoading) {
@@ -113,7 +113,6 @@ export default function ConstantsList() {
                     }
                 `}
             </style>
-            {toastHtml}
             {formError && (
                 <>
                     <Banner title="Error" status="critical">

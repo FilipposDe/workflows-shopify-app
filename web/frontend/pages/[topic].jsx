@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom"
+import { useLocation, useParams } from "react-router-dom"
 import {
     Card,
     ButtonGroup,
@@ -15,19 +15,19 @@ import {
 } from "@shopify/polaris"
 
 import { useState } from "react"
-
+import { useToast, TitleBar } from "@shopify/app-bridge-react"
 import { codeDecode, codeEncode } from "../helpers/codeEncoding"
 import useFetch from "../hooks/useFetch"
 import useNav from "../hooks/useNav"
-import { useToast } from "@shopify/app-bridge-react"
 import useData from "../hooks/useData"
-import CodeEditor from "./CodeEditor"
-import WorkflowStatus from "./WorkflowStatus"
+import CodeEditor from "../components/CodeEditor"
+import WorkflowStatus from "../components/WorkflowStatus"
 import getDefaultCode from "../helpers/defaultCode"
-import CustomModal from "./CustomModal"
+import CustomModal from "../components/CustomModal"
 
 function Workflow() {
-    const { topic } = useParams()
+    const { pathname } = useLocation()
+    const topic = pathname.replace("/", "")
 
     const [data, setData] = useState({})
     const [saveLoading, setSaveLoading] = useState(false)
@@ -38,7 +38,7 @@ function Workflow() {
     const fetch = useFetch()
     const nav = useNav()
 
-    const { setToast, toastHtml } = useToast()
+    const { show: showToast } = useToast()
 
     const [loadingStates, setLoadingStates] = useState({})
 
@@ -67,7 +67,7 @@ function Workflow() {
         if (error) return setFormError(error)
         workflowMutate({ ...responseData })
         setData({ ...responseData, code: codeDecode(responseData.code) })
-        setToast("Saved")
+        showToast("Saved")
     }
 
     async function deleteWorkflow() {
@@ -89,8 +89,8 @@ function Workflow() {
             "POST"
         )
         setLoadingStates({ ...loadingStates, publish: false })
-        if (error) return setToast(error, true)
-        setToast(workflow.published ? "Unpublished" : "Published")
+        if (error) return showToast(error, { error: true })
+        showToast(workflow.published ? "Unpublished" : "Published")
         workflowMutate({ ...responseData })
         setData({ ...responseData, code: codeDecode(responseData.code) })
     }
@@ -129,36 +129,39 @@ function Workflow() {
 
     return (
         <Frame>
-            {toastHtml}
             <Page
-                title={workflow?.topic}
                 fullWidth
-                primaryAction={{
-                    content: "Save",
-                    disabled: !data.topic,
-                    loading: saveLoading,
-                    onAction: () => saveWorkflow(),
-                }}
-                secondaryActions={[
-                    {
-                        content: "Delete",
-                        destructive: true,
-                        onAction: () => setIsDeleteModalOpen(true),
-                        outline: true,
-                    },
-                    {
-                        content: workflow?.published ? "Unpublish" : "Publish",
-                        onAction: () => togglePublishWorkflow(),
-                        loading: loadingStates.publish,
-                    },
-                ]}
-                breadcrumbs={[
-                    { content: "Workflows", onAction: () => nav("/") },
-                ]}
                 titleMetadata={
                     workflow ? <WorkflowStatus workflow={workflow} /> : null
                 }
             >
+                <TitleBar
+                    title={workflow?.topic}
+                    primaryAction={{
+                        content: "Save",
+                        disabled: !data.topic,
+                        loading: saveLoading,
+                        onAction: () => saveWorkflow(),
+                    }}
+                    secondaryActions={[
+                        {
+                            content: "Delete",
+                            destructive: true,
+                            onAction: () => setIsDeleteModalOpen(true),
+                            outline: true,
+                        },
+                        {
+                            content: workflow?.published
+                                ? "Unpublish"
+                                : "Publish",
+                            onAction: () => togglePublishWorkflow(),
+                            loading: loadingStates.publish,
+                        },
+                    ]}
+                    breadcrumbs={[
+                        { content: "Workflows", onAction: () => nav("/") },
+                    ]}
+                />
                 <Layout>
                     <Layout.Section>
                         <Card sectioned title={`Edit workflow for ${topic}`}>

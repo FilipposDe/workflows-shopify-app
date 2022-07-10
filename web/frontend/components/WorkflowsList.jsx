@@ -18,7 +18,7 @@ export default function WorkflowsList() {
     const nav = useNav()
     const fetch = useFetch()
 
-    const { setToast, toastHtml } = useToast()
+    const { show: showToast } = useToast()
 
     const [loadingStates, setLoadingStates] = useState({})
 
@@ -37,8 +37,8 @@ export default function WorkflowsList() {
             "POST"
         )
         setLoadingStates({ ...loadingStates, publish: false })
-        if (error) return setToast(error, true)
-        setToast(workflow.published ? "Unpublished" : "Published")
+        if (error) return showToast(error, { error: true })
+        showToast(workflow.published ? "Unpublished" : "Published")
         workflowsRefetch()
     }
 
@@ -88,7 +88,6 @@ export default function WorkflowsList() {
 
     return (
         <>
-            {toastHtml}
             <ResourceList
                 emptyState={emptyState}
                 resourceName={{

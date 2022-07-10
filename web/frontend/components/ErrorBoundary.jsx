@@ -31,12 +31,14 @@ export default class ErrorBoundary extends Component {
                             fontSize: "16px",
                             textAlign: "center",
                             marginTop: "40px",
+                            display: "block",
                         }}
                     >
                         Something went wrong.
                         <small
                             style={{
                                 marginTop: "30px",
+                                display: "block",
                             }}
                         >
                             {this.getMessage(this.state.error)}
