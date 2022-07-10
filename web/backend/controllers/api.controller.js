@@ -176,7 +176,7 @@ const deleteWorkflow = catchAsync(async (req, res) => {
 
 const getConstants = catchAsync(async (req, res) => {
     const constantsStr = await Settings.get("constants")
-    const constants = JSON.parse(constantsStr) || []
+    const constants = JSON.parse(constantsStr || "[]")
     for (const item of constants) {
         if (!item.encrypt) continue
         item.value = decrypt(item.value)
@@ -192,7 +192,7 @@ const updateConstants = catchAsync(async (req, res) => {
     }
     const constantsStr = JSON.stringify(constantsBody)
     const constantsNewStr = await Settings.put("constants", constantsStr)
-    const newConstants = JSON.parse(constantsNewStr) || []
+    const newConstants = JSON.parse(constantsNewStr || "[]")
     await dynamicFilesService.setConstants() // TODO decrypt
     for (const item of newConstants) {
         if (!item.encrypt) continue

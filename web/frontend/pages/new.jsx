@@ -78,7 +78,7 @@ export default function CreateWorkflow() {
 
     return (
         <Frame>
-            <Page fullWidth>
+            <Page>
                 <TitleBar
                     title="Create workflow"
                     primaryAction={{

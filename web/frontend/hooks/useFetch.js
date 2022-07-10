@@ -1,4 +1,4 @@
-import { useAppBridge } from "@shopify/app-bridge-react"
+import { useAuthenticatedFetch } from "./useAuthenticatedFetch"
 
 class HttpError extends Error {
     constructor(message, httpStatus) {
@@ -9,9 +9,7 @@ class HttpError extends Error {
 }
 
 function useFetch() {
-    const app = useAppBridge()
-    const appFetch = () => null
-    // const appFetch = userLoggedInFetch(app) // TODO
+    const appFetch = useAuthenticatedFetch()
 
     async function fetchAPI(
         url,
