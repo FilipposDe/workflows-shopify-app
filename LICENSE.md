@@ -1,3 +1,9 @@
+## Workflows
+
+MIT License
+
+## Shopify Node App
+
 MIT License
 
 Copyright (c) 2018 Shopify

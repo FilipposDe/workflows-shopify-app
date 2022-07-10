@@ -4,46 +4,31 @@ This is a custom, embedded Shopify app that allows you to write code inside its 
 
 ## Architecture
 
-### Differences from Shopify's default app
+Build on Shopify's Node.js and React.js template. Uses Firebase's Firestore for data storage (backend).
+
+## Differences from Shopify's Node app template
 
 -   Proper monorepo structure, using NPM Workspaces and a single node_modules folder (Shopify CLI will attempt to install dependencies in each package, so the `--skip-dependencies-installation` argument is used on the `dev` script)
 -   Frontend and backend are separate, instead of nested (since frontend route acts as as proxy for backend)
 -   Auth routes are not middleware, they are part of the app's routes.
--   The app is embeddedm requesting both offline and online tokens, and meant for one shop only
+-   The app is embedded, requesting both offline and online tokens, and meant for one shop only
+-   Heroku specific deployment scripts
 
 ## Requirements
 
--   If you don’t have one, [create a Shopify partner account](https://partners.shopify.com/signup).
--   If you don’t have one, [create a Development store](https://help.shopify.com/en/partners/dashboard/development-stores#create-a-development-store) where you can install and test your app.
--   If you haven't, install the [Shopify CLI](https://github.com/Shopify/shopify-cli)
+-   Firebase project with service account
 
-## Installation
+## Development
 
-TODO
+1. Clone the repository
+2. Setup the Firebase project
+3. Set the variables in `.env` and `shopify.app.toml`
+4. Install / create an account with Ngrok
+5. Run `npm install` on the root directory
+6. Run `npm run dev` on the root directory, to start the Shopify CLI
+7. Setup the app with the CLI (Ngrok, app and store)
+8. When it's built, visit the generated link to install on the store and use the app
 
-        "heroku-postinstall": "npm run build:client",
+## Configuration
 
-////
-
-Add the right scopes and enable the right topics in common
-
--   **If you are not using the Shopify CLI**, in the Partner dashboard, [create a new app](https://help.shopify.com/en/api/tools/partner-dashboard/your-apps#create-a-new-app). You’ll need this app’s API credentials during the setup process.
-
-It leverages the [Shopify API Library](https://github.com/Shopify/shopify-node-api) on the backend to create [an embedded app](https://shopify.dev/apps/tools/app-bridge/getting-started#embed-your-app-in-the-shopify-admin), and [Polaris](https://github.com/Shopify/polaris-react) and [App Bridge React](https://shopify.dev/tools/app-bridge/react-components) on the frontend.
-
-This is the repository used when you create a new Node app with the [Shopify CLI](https://shopify.dev/apps/tools/cli).
-
-Using the [Shopify CLI](https://github.com/Shopify/shopify-cli) run:
-
-```sh
-shopify app create node -n APP_NAME
-```
-
-Or, you can run `npx degit shopify/shopify-app-node` and create a `.env` file containing the following values:
-
-```yaml
-SHOPIFY_API_KEY={api key}           # Your API key
-SHOPIFY_API_SECRET={api secret key} # Your API secret key
-SCOPES={scopes}                     # Your app's required scopes, comma-separated
-HOST={your app's host}              # Your app's host, without the protocol prefix
-```
+You can enable available topics on `web/common/topic-list.js`
