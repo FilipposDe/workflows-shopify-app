@@ -9,7 +9,9 @@
         "dev:v": "shopify app dev --skip-dependencies-installation --verbose",
         "info": "shopify app info",
         "scaffold": "shopify app scaffold",
-        "deploy": "shopify app deploy"
+        "deploy": "shopify app deploy",
+        "heroku-postbuild": "npm run web/frontend:build",
+        "start": "npm run web/backend:serve"
     },
     "workspaces": [
         "web/backend",
