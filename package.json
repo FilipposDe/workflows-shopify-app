@@ -3,24 +3,19 @@
     "private": true,
     "license": "UNLICENSED",
     "scripts": {
-        "shopify": "shopify",
         "build": "shopify app build",
         "dev": "shopify app dev --skip-dependencies-installation",
-        "dev:v": "shopify app dev --skip-dependencies-installation --verbose",
-        "info": "shopify app info",
-        "scaffold": "shopify app scaffold",
         "deploy": "shopify app deploy",
         "heroku-postbuild": "npm run build -w web/frontend",
         "start": "npm run serve -w web/backend"
     },
     "workspaces": [
-        "web/*",
+        "web/backend",
         "web/frontend"
     ],
     "dependencies": {
         "@shopify/app": "^3",
-        "@shopify/cli": "^3",
-        "@vitejs/plugin-react": "^2.0.0"
+        "@shopify/cli": "^3"
     },
     "devDependencies": {
         "@typescript-eslint/eslint-plugin": "^5.30.5",
