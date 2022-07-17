@@ -31,10 +31,11 @@ function getHandler(topic) {
 }
 
 function addExistingHandlers(topics, getHandler) {
+    console.log(JSON.stringify(topics))
     try {
         for (const topic of topics) {
             Shopify.Webhooks.Registry.addHandler(topic, {
-                path: "/webhooks",
+                path: "/api/webhooks",
                 webhookHandler: getHandler(topic),
             })
         }
@@ -99,6 +100,8 @@ async function reRegisterExistingWebhooks() {
             accessToken: offlineSession.accessToken,
             path: "/webhooks",
         })
+
+        console.log(JSON.stringify(response))
 
         const addedTopics = Shopify.Webhooks.Registry.getTopics()
         for (const topic of addedTopics) {

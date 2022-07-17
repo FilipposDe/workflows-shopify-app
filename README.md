@@ -13,6 +13,7 @@ Build on Shopify's Node.js and React.js template. Uses Firebase's Firestore for 
 -   Auth routes are not middleware, they are part of the app's routes.
 -   The app is embedded, requesting both offline and online tokens, and meant for one shop only
 -   Heroku specific deployment scripts
+-   Real React HMR support during development (server adds preamble script to `index.html`)
 
 ## Requirements
 

@@ -39,7 +39,7 @@ export async function createServer(
     await setServerSettings(app)
     app.use(cookieParser(Shopify.Context.API_SECRET_KEY))
     app.use("/api/auth", authRoutes)
-    app.use("/webhooks", webhookRoutes)
+    app.use("/api/webhooks", webhookRoutes)
     app.use("/api/*", verifyRequest(app))
     app.use("/api/graphql", graphqlRoutes)
     app.use("/api", express.json(), apiRoutes)

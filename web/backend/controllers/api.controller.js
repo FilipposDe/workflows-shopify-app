@@ -104,8 +104,6 @@ async function getStatus(workflow) {
     if (fileContent.trim() !== workflow.code.trim()) {
         status.outdatedFileInServer = true
     }
-    const h = shopifyService.getHandler(workflow.topic)
-    console.log({ h })
 
     return status
 }
