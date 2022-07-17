@@ -1,4 +1,4 @@
-import { useLocation, useParams } from "react-router-dom"
+import { useLocation } from "react-router-dom"
 import {
     Card,
     ButtonGroup,
@@ -167,7 +167,7 @@ function Workflow() {
                         <Card sectioned title={`Edit workflow for ${topic}`}>
                             {!!formError && (
                                 <Banner status="critical">
-                                    <p>{workflowError}</p>
+                                    <p>{formError}</p>
                                 </Banner>
                             )}
 

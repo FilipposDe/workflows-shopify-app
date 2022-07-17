@@ -1,10 +1,11 @@
-// import react from "@vitejs/plugin-react"
 import { dirname } from "path"
 import { fileURLToPath } from "url"
 import * as dotenv from "dotenv"
 import { defineConfig } from "vite"
+import react from "@vitejs/plugin-react"
+
 dotenv.config({ path: "../../.env" })
-console.log({ p: process.env.HOST })
+
 if (
     process.env.npm_lifecycle_event === "build" &&
     !process.env.CI &&
@@ -56,12 +57,11 @@ const config = {
         "process.env.SHOPIFY_API_KEY": JSON.stringify(
             process.env.SHOPIFY_API_KEY
         ),
-        "process.env.HOST": JSON.stringify(process.env.HOST),
     },
-    // plugins: [react()],
     esbuild: {
         jsxInject: `import React from 'react'`,
     },
+    plugins: [react()],
     resolve: {
         preserveSymlinks: true,
         alias: {

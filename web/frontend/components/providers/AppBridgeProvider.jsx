@@ -3,6 +3,20 @@ import { useLocation, useNavigate } from "react-router-dom"
 import { Provider } from "@shopify/app-bridge-react"
 import { Banner, Layout, Page } from "@shopify/polaris"
 
+// if (import.meta.hot) {
+//     console.log(import.meta.hot.data)
+//     import.meta.hot.dispose((data) => {
+//         console.log("Setting")
+//         // data.host = window.__SHOPIFY_DEV_HOST
+//     })
+//     import.meta.hot.accept((newModule) => {
+//         // if (newModule) {
+//         // 	// newModule is undefined when SyntaxError happened
+//         // 	console.log('updated: count is now   ', c)
+//         // }
+//     })
+// }
+
 /**
  * Stores the initial host param, returns the
  * config object for the App Bridge Provider.
@@ -13,9 +27,14 @@ function useAppBridgeConfig() {
     // Store the host, which may be present initially,
     // but later removed by navigation.
     const [appBridgeConfig] = useState(() => {
+        // Get from param, or window, or Vite HMR data
         const hostParam = new URLSearchParams(location.search).get("host")
-        const host = hostParam || window.__SHOPIFY_DEV_HOST
+        const host =
+            hostParam ||
+            window.__SHOPIFY_DEV_HOST ||
+            import.meta?.hot?.data?.host
         window.__SHOPIFY_DEV_HOST = host
+
         return {
             host,
             apiKey: process.env.SHOPIFY_API_KEY,

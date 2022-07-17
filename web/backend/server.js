@@ -19,23 +19,6 @@ const { Settings } = dbService
 const { Shopify } = shopifyService
 const router = express.Router()
 
-function getViteDevOpts(root) {
-    return {
-        root,
-        logLevel: config.isTest ? "error" : "info",
-        server: {
-            port: config.PORT,
-            hmr: {
-                protocol: "ws",
-                host: "localhost",
-                port: 64999,
-                clientPort: 64999,
-            },
-            middlewareMode: "html",
-        },
-    }
-}
-
 async function setServerSettings(app) {
     let isShopInstalled
     try {
@@ -73,14 +56,34 @@ export async function createServer(
     }
 
     app.use("/*", cspHeaders(), isShopInstalled(), async (_req, res) => {
+        console.log("HIT")
         const fs = await import("fs")
         const indexUrl = isProd
             ? `${process.cwd()}/../frontend/dist/index.html`
             : `${process.cwd()}/../frontend/index.html`
 
-        res.status(200)
-            .set("Content-Type", "text/html")
-            .send(fs.readFileSync(indexUrl))
+        let indexHtml = fs.readFileSync(indexUrl)
+        if (!isProd) {
+            // Inject preamble for React plugin on Dev.
+            // The Vite React plugin does not transform the html
+            // because we're serving the index.html directly with
+            // the Vite dev server as a proxy.
+            // https://vitejs.dev/guide/backend-integration.html
+            indexHtml = indexHtml.toString().replace(
+                "<head>",
+                `<head>
+                    <script type="module">
+                        import RefreshRuntime from '${config.HOST}/@react-refresh'
+                        RefreshRuntime.injectIntoGlobalHook(window)
+                        window.$RefreshReg$ = () => {}
+                        window.$RefreshSig$ = () => (type) => type
+                        window.__vite_plugin_react_preamble_installed__ = true
+                    </script>
+                `
+            )
+        }
+
+        res.status(200).set("Content-Type", "text/html").send(indexHtml)
     })
 
     app.use(errorConverter)

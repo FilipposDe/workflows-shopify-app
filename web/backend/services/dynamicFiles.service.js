@@ -118,7 +118,7 @@ function getConstants() {
     return CONSTANTS
 }
 
-function getConstant(key) {
+export function getConstant(key) {
     return CONSTANTS[key]
 }
 

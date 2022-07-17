@@ -19,7 +19,8 @@
     ],
     "dependencies": {
         "@shopify/app": "^3",
-        "@shopify/cli": "^3"
+        "@shopify/cli": "^3",
+        "@vitejs/plugin-react": "^2.0.0"
     },
     "devDependencies": {
         "@typescript-eslint/eslint-plugin": "^5.30.5",

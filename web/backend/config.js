@@ -4,6 +4,7 @@ dotenv.config({ path: "../../.env" })
 
 const optionalEnvVars = [
     "PORT",
+    "FRONTEND_PORT",
     "BACKEND_PORT",
     "VITE_TEST_BUILD",
     "GOOGLE_APPLICATION_CREDENTIALS",
@@ -50,6 +51,7 @@ function createConfig() {
     }
     Object.assign(config, configVars)
     config.BACKEND_PORT = parseInt(config.BACKEND_PORT || config.PORT, 10)
+    config.FRONTEND_PORT = parseInt(config.FRONTEND_PORT, 10)
     config.isTest = config.NODE_ENV === "test" || !!config.VITE_TEST_BUILD
     config.isProd = config.NODE_ENV === "production"
     config.isDev = config.NODE_ENV === "development"
