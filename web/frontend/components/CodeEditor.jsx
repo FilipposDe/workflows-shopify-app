@@ -9,7 +9,6 @@ async function addAutoTypes(editor, monaco) {
         preloadPackages: true,
         versions: {
             "@shopify/shopify-api": "3.0.1",
-            // "%40shopify/shopify-api": "3.0.1",
         },
     })
 }
@@ -26,7 +25,6 @@ function CodeEditor(props) {
         >
             <Suspense fallback={<div></div>}>
                 <Editor
-                    // beforeMount={addTypes}
                     onMount={addAutoTypes}
                     height="40vh"
                     language="typescript"

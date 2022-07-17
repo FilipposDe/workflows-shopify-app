@@ -7,7 +7,6 @@ import {
     ResourceList,
     ResourceItem,
 } from "@shopify/polaris"
-
 import { useState } from "react"
 import useData from "../hooks/useData"
 import useFetch from "../hooks/useFetch"

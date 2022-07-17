@@ -1,6 +1,8 @@
 {
     "name": "workflows-frontend",
     "private": true,
+    "license": "MIT",
+    "author": "Filippos Dematis",
     "scripts": {
         "build": "vite build",
         "dev": "vite",

@@ -1,10 +1,10 @@
+import { BrowserRouter } from "react-router-dom"
+import { NavigationMenu } from "@shopify/app-bridge-react"
 import { AppProvider as PolarisProvider } from "@shopify/polaris"
 import "@shopify/polaris/build/esm/styles.css"
-import { BrowserRouter } from "react-router-dom"
 import GraphQLProvider from "./components/providers/GraphQLProvider"
 import AppBridgeProvider from "./components/providers/AppBridgeProvider"
 import ErrorBoundary from "./components/ErrorBoundary"
-import { NavigationMenu } from "@shopify/app-bridge-react"
 import Routes from "./Routes"
 
 const pages = import.meta.globEager("./pages/**/!(*.test.[jt]sx)*.([jt]sx)")

@@ -6,10 +6,7 @@ export default function NotFound() {
             <Card>
                 <Card.Section>
                     <EmptyState heading="There is no page at this address">
-                        <p>
-                            Check the URL and try again, or use the search bar
-                            to find what you need.
-                        </p>
+                        <p>Check the URL and try again.</p>
                     </EmptyState>
                 </Card.Section>
             </Card>

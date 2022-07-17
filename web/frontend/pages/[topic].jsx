@@ -13,7 +13,6 @@ import {
     Banner,
     Spinner,
 } from "@shopify/polaris"
-
 import { useState } from "react"
 import { useToast, TitleBar } from "@shopify/app-bridge-react"
 import { codeDecode, codeEncode } from "../helpers/codeEncoding"

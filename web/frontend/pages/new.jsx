@@ -13,7 +13,6 @@ import {
     Spinner,
 } from "@shopify/polaris"
 import { TitleBar } from "@shopify/app-bridge-react"
-
 import { useEffect, useState } from "react"
 import useData from "../hooks/useData"
 import useFetch from "../hooks/useFetch"

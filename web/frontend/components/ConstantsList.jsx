@@ -10,7 +10,6 @@ import {
     Spinner,
     Checkbox,
 } from "@shopify/polaris"
-
 import { useState } from "react"
 import useData from "../hooks/useData"
 import useFetch from "../hooks/useFetch"
@@ -32,7 +31,6 @@ export default function ConstantsList() {
     const [data, setData] = useState([])
     const [saveLoading, setSaveLoading] = useState(false)
     const [formError, setFormError] = useState("")
-    // const [errorStates, setErrorStates] = useState({})
 
     function changeConstant(item, newItem) {
         const index = data.indexOf(item)
@@ -153,11 +151,9 @@ export default function ConstantsList() {
                                                 value: v,
                                             })
                                         }
-                                        // onChange={handleTextFieldChange}
                                         autoComplete="off"
                                         connectedRight={
                                             <Checkbox
-                                                // labelHidden={true}
                                                 label="Encrypt"
                                                 checked={item.encrypt}
                                                 onChange={(v) =>
@@ -175,12 +171,7 @@ export default function ConstantsList() {
                     ))}
 
                     <ButtonGroup>
-                        <Button
-                            submit
-                            primary
-                            loading={saveLoading}
-                            // disabled={!data.topic}
-                        >
+                        <Button submit primary loading={saveLoading}>
                             Save
                         </Button>
                     </ButtonGroup>
