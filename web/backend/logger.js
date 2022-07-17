@@ -1,5 +1,4 @@
 import winston from "winston"
-
 import Transport from "winston-transport"
 import config from "./config.js"
 import dbService from "./services/db.service.js"
@@ -12,7 +11,6 @@ class FirebaseTransport extends Transport {
     constructor(opts) {
         super(opts)
         this.counter = 0
-        // this.updateDBCount()
     }
 
     async log(info, callback) {
@@ -97,15 +95,7 @@ export function initLogger() {
                 }),
                 new FirebaseTransport({
                     level: "error",
-                    format: winston.format.combine(
-                        winston.format.uncolorize()
-                        // winston.format.printf(
-                        //     ({ level, message, metadata }) =>
-                        //         `${level}: ${message} ${JSON.stringify(
-                        //             metadata
-                        //         )}`
-                        // )
-                    ),
+                    format: winston.format.combine(winston.format.uncolorize()),
                 }),
             ],
         })

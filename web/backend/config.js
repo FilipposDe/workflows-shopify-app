@@ -2,7 +2,7 @@ import { ApiVersion } from "@shopify/shopify-api"
 import * as dotenv from "dotenv"
 dotenv.config({ path: "../../.env" })
 
-const optionalEnvVars = [
+const optionalVars = [
     "PORT",
     "FRONTEND_PORT",
     "BACKEND_PORT",
@@ -10,7 +10,7 @@ const optionalEnvVars = [
     "GOOGLE_APPLICATION_CREDENTIALS",
 ]
 
-const requiredEnvVars = [
+const requiredVars = [
     "NODE_ENV",
     "SHOPIFY_API_KEY",
     "SHOPIFY_API_SECRET",
@@ -30,12 +30,10 @@ const configVars = {
     SHOPIFY_API_VERSION: ApiVersion.July22,
 }
 
-function validateEnv() {
-    for (const key of requiredEnvVars) {
+function validate() {
+    for (const key of requiredVars) {
         if (!process.env[key]) {
-            console.error(
-                `Environment variable missing: ${key}. Shutting down app.`
-            )
+            console.error(`Environment variable missing: "${key}". Exiting.`)
             process.exit(1)
         }
     }
@@ -43,10 +41,10 @@ function validateEnv() {
 
 function createConfig() {
     const config = {}
-    for (const key of optionalEnvVars) {
+    for (const key of optionalVars) {
         config[key] = process.env[key]
     }
-    for (const key of requiredEnvVars) {
+    for (const key of requiredVars) {
         config[key] = process.env[key]
     }
     Object.assign(config, configVars)
@@ -59,7 +57,8 @@ function createConfig() {
     return config
 }
 
-validateEnv()
+validate()
+
 const config = createConfig()
 
 export default config

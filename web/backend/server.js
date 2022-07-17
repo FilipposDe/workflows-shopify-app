@@ -1,7 +1,6 @@
 import express from "express"
 import cookieParser from "cookie-parser"
 import { resolve } from "path"
-
 import { errorConverter, errorHandler } from "./middleware/error.js"
 import isShopInstalled from "./middleware/is-shop-installed.js"
 import authRoutes from "./routes/auth.routes.js"
@@ -14,10 +13,10 @@ import logger from "./logger.js"
 import dbService from "./services/db.service.js"
 import shopifyService from "./services/shopify.service.js"
 import verifyRequest from "./middleware/verify-request.js"
+import { getViteReactPreamble } from "./helpers/util.js"
 
 const { Settings } = dbService
 const { Shopify } = shopifyService
-const router = express.Router()
 
 async function setServerSettings(app) {
     let isShopInstalled
@@ -32,12 +31,14 @@ async function setServerSettings(app) {
 }
 
 export async function createServer(
-    root = process.cwd(),
+    _root = process.cwd(),
     isProd = config.isProd
 ) {
     const app = express()
+
     await setServerSettings(app)
     app.use(cookieParser(Shopify.Context.API_SECRET_KEY))
+
     app.use("/api/auth", authRoutes)
     app.use("/api/webhooks", webhookRoutes)
     app.use("/api/*", verifyRequest(app))
@@ -56,7 +57,6 @@ export async function createServer(
     }
 
     app.use("/*", cspHeaders(), isShopInstalled(), async (_req, res) => {
-        console.log("HIT")
         const fs = await import("fs")
         const indexUrl = isProd
             ? `${process.cwd()}/../frontend/dist/index.html`
@@ -72,13 +72,7 @@ export async function createServer(
             indexHtml = indexHtml.toString().replace(
                 "<head>",
                 `<head>
-                    <script type="module">
-                        import RefreshRuntime from '${config.HOST}/@react-refresh'
-                        RefreshRuntime.injectIntoGlobalHook(window)
-                        window.$RefreshReg$ = () => {}
-                        window.$RefreshSig$ = () => (type) => type
-                        window.__vite_plugin_react_preamble_installed__ = true
-                    </script>
+                    ${getViteReactPreamble()}
                 `
             )
         }

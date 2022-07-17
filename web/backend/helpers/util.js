@@ -26,3 +26,15 @@ export function removeChars(text, removeChars) {
     }
     return result
 }
+
+export function getViteReactPreamble() {
+    return `
+        <script type="module">
+            import RefreshRuntime from '${config.HOST}/@react-refresh'
+            RefreshRuntime.injectIntoGlobalHook(window)
+            window.$RefreshReg$ = () => {}
+            window.$RefreshSig$ = () => (type) => type
+            window.__vite_plugin_react_preamble_installed__ = true
+        </script>
+    `
+}

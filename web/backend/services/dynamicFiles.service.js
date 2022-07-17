@@ -9,7 +9,7 @@ import { decrypt } from "../helpers/crypt.js"
 
 const { Workflows, Settings } = dbService
 
-// TODO more error handling
+// TODO improve error handling
 
 const DYNAMIC_IMPORTS = {}
 const CONSTANTS = {}
@@ -97,7 +97,7 @@ function addFile(fileName, code) {
     try {
         lintDynamicFile(fileName)
     } catch (error) {
-        throw new ApiError(400, "Found file validation") // TODO
+        throw new ApiError(400, error.message)
     }
 }
 

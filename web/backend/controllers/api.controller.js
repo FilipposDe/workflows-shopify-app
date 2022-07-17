@@ -1,5 +1,4 @@
 import { encrypt, decrypt } from "../helpers/crypt.js"
-
 import shopifyService from "../services/shopify.service.js"
 import files from "../services/dynamicFiles.service.js"
 import dbService from "../services/db.service.js"
@@ -32,7 +31,8 @@ async function cleanupTopicHandler(topic) {
     const result = await clientG.query({ data: allTopicWebhooksQuery })
     if (!result?.body?.data?.webhookSubscriptions?.edges?.length) {
         console.log(result?.body)
-        // TODO it's okay if there's none, not okay if there are errors
+        // TODO it's possible okay if there's none,
+        // not okay if there are errors
         throw new ApiError(404, "Could not find this webhook on Shopify")
     }
     const ids = result.body.data.webhookSubscriptions.edges.map(
@@ -191,7 +191,7 @@ const updateConstants = catchAsync(async (req, res) => {
     const constantsStr = JSON.stringify(constantsBody)
     const constantsNewStr = await Settings.put("constants", constantsStr)
     const newConstants = JSON.parse(constantsNewStr || "[]")
-    await dynamicFilesService.setConstants() // TODO decrypt
+    await dynamicFilesService.setConstants()
     for (const item of newConstants) {
         if (!item.encrypt) continue
         item.value = decrypt(item.value)

@@ -1,7 +1,8 @@
 {
     "name": "workflows",
     "private": true,
-    "license": "UNLICENSED",
+    "license": "MIT",
+    "author": "Filippos Dematis",
     "scripts": {
         "build": "shopify app build",
         "dev": "shopify app dev --skip-dependencies-installation",

@@ -28,10 +28,9 @@ export function decrypt(text) {
         decrypted = decipher.update(encryptedText)
         decrypted = Buffer.concat([decrypted, decipher.final()])
     } catch (error) {
-        // TODO
+        // TODO handle and throw error
         console.error("error")
         return null
-        // throw new Error('Decryption failed')
     }
     return decrypted.toString()
 }
